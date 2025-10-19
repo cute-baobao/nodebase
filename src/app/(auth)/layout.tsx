@@ -1,14 +1,9 @@
-import { requireNoAuth } from '@/lib/utils/auth-utils';
+import AuthLayout from '@/features/auth/components/auth-layout';
 
-export default async function AuthLayout({
+export default async function Layout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  await requireNoAuth();  
-  return (
-    <div className="flex min-h-screen w-full items-center justify-center">
-      {children}
-    </div>
-  );
+  return <AuthLayout>{children}</AuthLayout>;
 }

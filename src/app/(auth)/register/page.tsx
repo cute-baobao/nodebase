@@ -1,5 +1,7 @@
 import RegisterForm from '@/features/auth/components/register-form';
+import { requireNoAuth } from '@/lib/utils';
 
-export default function RegisterPage() {
+export default async function RegisterPage() {
+  await requireNoAuth();
   return <RegisterForm />;
 }

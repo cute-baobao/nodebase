@@ -22,7 +22,8 @@ import { signIn } from '@/lib/auth-client';
 import { loginFormSchema, LoginFormSchema } from '@/lib/shared/schemas/auth';
 import { cn } from '@/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Github, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -35,6 +36,9 @@ export default function LoginForm() {
 
   const loginForm = useForm<LoginFormSchema>({
     resolver: zodResolver(loginFormSchema),
+    // validate on change so `formState.isValid` updates promptly
+    mode: 'onChange',
+    reValidateMode: 'onChange',
     defaultValues: {
       email: '',
       password: '',
@@ -64,7 +68,8 @@ export default function LoginForm() {
     });
   };
 
-  const isPending = loginForm.formState.isValid || loading;
+  // use isSubmitting for request-in-flight state, and isValid to enable submit
+  const { isValid, isSubmitting } = loginForm.formState;
 
   return (
     <Card className="w-full max-w-md">
@@ -117,6 +122,7 @@ export default function LoginForm() {
                         <Input
                           type="password"
                           placeholder="********"
+                          autoComplete="current-password"
                           {...field}
                         />
                       </FormControl>
@@ -126,8 +132,12 @@ export default function LoginForm() {
                 />
               </div>
 
-              <Button type="submit" className="w-full" disabled={isPending}>
-                {isPending ? (
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={!isValid || isSubmitting}
+              >
+                {isSubmitting ? (
                   <Loader2 size={16} className="animate-spin" />
                 ) : (
                   <p> Login </p>
@@ -162,7 +172,12 @@ export default function LoginForm() {
                     );
                   }}
                 >
-                  <Github className="size-4" />
+                  <Image
+                    src="/logos/github.svg"
+                    alt="Github Logo"
+                    width={16}
+                    height={16}
+                  />
                   Sign in with Github
                 </Button>
               </div>
