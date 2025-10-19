@@ -1,5 +1,5 @@
 import { drizzle } from 'drizzle-orm/neon-http';
-import * as schema from './schema';
+import * as schema from './schemas';
 
 const createDrizzleClient = () =>
   drizzle({
@@ -18,5 +18,7 @@ export const db = globalForDrizzle.drizzle ?? createDrizzleClient();
 if (process.env.NODE_ENV !== 'production') {
   globalForDrizzle.drizzle = db;
 }
+
+export * from './schemas';
 
 export default db;
