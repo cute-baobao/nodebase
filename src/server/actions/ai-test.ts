@@ -2,5 +2,8 @@
 import { inngest } from '@/inngest/client';
 
 export const test = async () => {
-  await inngest.setEventKey("execute/ai")
+  await inngest.send({
+    name: 'execute/ai',
+  });
+  return { success: true, message: 'Job Success' };
 };

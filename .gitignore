@@ -34,7 +34,8 @@ yarn-error.log*
 .env*
 !.env.example
 
-.mprocs.log
+mprocs.log
+mprocs.yaml
 
 # vercel
 .vercel

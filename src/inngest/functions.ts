@@ -26,6 +26,6 @@ export const ai = inngest.createFunction(
       model: google('gemini-2.5-flash'),
       prompt: 'say gogogo',
     });
-    return steps;
+    return { steps };
   },
 );
