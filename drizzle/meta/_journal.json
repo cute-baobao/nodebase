@@ -8,6 +8,13 @@
       "when": 1761054734189,
       "tag": "0000_better_auth",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1761140254379,
+      "tag": "0001_add_workflow",
+      "breakpoints": true
     }
   ]
 }

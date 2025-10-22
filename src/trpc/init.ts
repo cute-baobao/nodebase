@@ -1,5 +1,7 @@
 import { auth } from '@/lib/auth';
+import { polarClient } from '@/lib/polar';
 import { initTRPC, TRPCError } from '@trpc/server';
+import superjson from 'superjson';
 import { headers } from 'next/headers';
 import { cache } from 'react';
 export const createTRPCContext = cache(async () => {
@@ -16,7 +18,7 @@ const t = initTRPC.create({
   /**
    * @see https://trpc.io/docs/server/data-transformers
    */
-  // transformer: superjson,
+  transformer: superjson,
 });
 // Base router and procedure helpers
 export const createTRPCRouter = t.router;
@@ -29,5 +31,21 @@ export const protectedProcedure = baseProcedure.use(async ({ ctx, next }) => {
   if (!session || !session.user) {
     throw new TRPCError({ message: 'UnAuthorized', code: 'UNAUTHORIZED' });
   }
-  return next({ ...ctx });
+  return next({ ctx: { ...ctx, auth: session } });
 });
+
+export const premiumProcedure = protectedProcedure.use(
+  async ({ ctx, next }) => {
+    const customer = await polarClient.customers.getStateExternal({
+      externalId: ctx.auth.user.id,
+    });
+
+    if (
+      !customer.activeSubscriptions ||
+      customer.activeSubscriptions.length === 0
+    ) {
+      throw new TRPCError({ message: 'Pro Only', code: 'FORBIDDEN' });
+    }
+    return next({ ctx: { ...ctx, customer } });
+  },
+);
