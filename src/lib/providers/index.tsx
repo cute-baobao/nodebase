@@ -1,11 +1,11 @@
 'use client';
 
-import QueryProvider from './query-provider';
+import { TRPCReactProvider } from './trpc-client-provider';
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   return (
     <>
-      <QueryProvider>{children}</QueryProvider>
+      <TRPCReactProvider>{children}</TRPCReactProvider>
     </>
   );
 }
