@@ -1,7 +1,8 @@
-import { PlusIcon } from "lucide-react";
+import { PlusIcon, SearchIcon } from "lucide-react";
 import Link from "next/link";
 import { memo } from "react";
 import { Button } from "./ui/button";
+import { Input } from "./ui/input";
 
 type PureHeaderProps = {
   title: string;
@@ -15,7 +16,7 @@ type PureHeaderProps = {
   | { onNew?: never; newButtonHref?: never }
 );
 
-export const PureHeader = ({
+const PureHeader = ({
   title,
   description,
   newButtonLabel,
@@ -54,13 +55,14 @@ export const PureHeader = ({
 
 export const EntityHeader = memo(PureHeader);
 
-type PureContainerProps = {
+interface PureContainerProps {
   children: React.ReactNode;
   header?: React.ReactNode;
   search?: React.ReactNode;
   pagination?: React.ReactNode;
-};
-export const PureContainer = ({
+}
+
+const PureContainer = ({
   children,
   header,
   search,
@@ -81,3 +83,65 @@ export const PureContainer = ({
 };
 
 export const EntityContainer = memo(PureContainer);
+
+interface PureSearchProps {
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+}
+
+const PureSearch = ({ value, onChange, placeholder }: PureSearchProps) => {
+  return (
+    <div className="relative ml-auto">
+      <SearchIcon className="text-muted-foreground absolute top-1/2 left-3 size-3.5 -translate-y-1/2" />
+      <Input
+        className="bg-background border-border max-w-[200px] pl-8 shadow-none"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+      />
+    </div>
+  );
+};
+
+export const EntitySearch = memo(PureSearch);
+
+interface PurePaginationProps {
+  page: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+  disabled?: boolean;
+}
+
+const PurePagination = ({
+  page,
+  totalPages,
+  onPageChange,
+  disabled,
+}: PurePaginationProps) => {
+  return (
+    <div className="flex w-full items-center justify-between gap-x-2">
+      <div className="text-muted-foreground flex-1 text-sm">
+        Page {page} of {totalPages || 1}
+      </div>
+      <div className="py- flex items-center justify-end space-x-2">
+        <Button
+          disabled={disabled || page === 1}
+          variant={"outline"}
+          onClick={() => onPageChange(Math.max(1, page - 1))}
+        >
+          Previous
+        </Button>
+        <Button
+          disabled={disabled || page === totalPages || totalPages === 0}
+          variant={"outline"}
+          onClick={() => onPageChange(Math.min(totalPages, page + 1))}
+        >
+          Next
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+export const EntityPagination = memo(PurePagination);
