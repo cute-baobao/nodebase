@@ -1,5 +1,5 @@
-import { drizzle } from 'drizzle-orm/neon-http';
-import * as schema from './schemas';
+import { drizzle } from "drizzle-orm/neon-http";
+import * as schema from "./schemas";
 
 const createDrizzleClient = () =>
   drizzle({
@@ -15,10 +15,10 @@ const globalForDrizzle = globalThis as unknown as {
 export const db = globalForDrizzle.drizzle ?? createDrizzleClient();
 
 // 在开发环境中，将实例存储到全局对象中，这样热重载时会复用实例
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== "production") {
   globalForDrizzle.drizzle = db;
 }
 
-export * from './schemas';
+export * from "./schemas";
 
 export default db;

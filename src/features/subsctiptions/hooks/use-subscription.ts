@@ -1,9 +1,9 @@
-import { authClient } from '@/lib/auth-client';
-import { useQuery } from '@tanstack/react-query';
+import { authClient } from "@/lib/auth-client";
+import { useQuery } from "@tanstack/react-query";
 
 export function useSubscription() {
   return useQuery({
-    queryKey: ['subscription'],
+    queryKey: ["subscription"],
     queryFn: async () => {
       const { data } = await authClient.customer.state();
       return data;

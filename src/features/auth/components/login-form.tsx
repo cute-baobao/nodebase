@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -8,7 +8,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
+} from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -16,19 +16,19 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { signIn } from '@/lib/auth-client';
-import { loginFormSchema, LoginFormSchema } from '@/lib/shared/schemas/auth';
-import { cn } from '@/lib/utils';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader2 } from 'lucide-react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { toast } from 'sonner';
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { signIn } from "@/lib/auth-client";
+import { loginFormSchema, LoginFormSchema } from "@/lib/shared/schemas/auth";
+import { cn } from "@/lib/utils";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2 } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -37,11 +37,11 @@ export default function LoginForm() {
   const loginForm = useForm<LoginFormSchema>({
     resolver: zodResolver(loginFormSchema),
     // validate on change so `formState.isValid` updates promptly
-    mode: 'onChange',
-    reValidateMode: 'onChange',
+    mode: "onChange",
+    reValidateMode: "onChange",
     defaultValues: {
-      email: '',
-      password: '',
+      email: "",
+      password: "",
     },
   });
 
@@ -50,7 +50,7 @@ export default function LoginForm() {
     await signIn.email({
       email: data.email,
       password: data.password,
-      callbackURL: '/',
+      callbackURL: "/",
       fetchOptions: {
         onResponse: () => {
           setLoading(false);
@@ -62,7 +62,7 @@ export default function LoginForm() {
           toast.error(ctx.error.message);
         },
         onSuccess: async () => {
-          router.push('/');
+          router.push("/");
         },
       },
     });
@@ -146,20 +146,20 @@ export default function LoginForm() {
 
               <div
                 className={cn(
-                  'flex w-full items-center gap-2',
-                  'flex-col justify-between',
+                  "flex w-full items-center gap-2",
+                  "flex-col justify-between",
                 )}
               >
                 <Button
                   type="button"
                   variant="outline"
-                  className={cn('w-full gap-2')}
+                  className={cn("w-full gap-2")}
                   disabled={loading}
                   onClick={async () => {
                     await signIn.social(
                       {
-                        provider: 'github',
-                        callbackURL: '/',
+                        provider: "github",
+                        callbackURL: "/",
                       },
                       {
                         onRequest: (ctx) => {
@@ -191,7 +191,7 @@ export default function LoginForm() {
             Secured by <span className="text-orange-400">better-auth.</span>
           </p>
           <p className="text-center text-xs text-neutral-500">
-            Don't have an account?{' '}
+            Don't have an account?{" "}
             <Link href="/register" className="underline hover:text-blue-500">
               Sign up
             </Link>

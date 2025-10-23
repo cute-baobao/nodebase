@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import { EntityContainer, EntityHeader } from '@/components/entity-components';
-import { useUpgradeModal } from '@/lib/hooks/use-upgrade-modal';
+import { EntityContainer, EntityHeader } from "@/components/entity-components";
+import { useUpgradeModal } from "@/lib/hooks/use-upgrade-modal";
 import {
   useCreateWorkflow,
   useSuspenseWorkflows,
-} from '../hooks/use-workflows';
-import { useRouter } from 'next/navigation';
+} from "../hooks/use-workflows";
+import { useRouter } from "next/navigation";
 
 export function WorkflowsList() {
   const { data: workflows } = useSuspenseWorkflows();
@@ -25,7 +25,7 @@ export function WorkflowsHeader({ disabled }: { disabled?: boolean }) {
 
   const handleCreate = () => {
     createWorkflow.mutate(undefined, {
-      onSuccess:(data) => {
+      onSuccess: (data) => {
         router.push(`/workflows/${data[0].id}`);
       },
       onError: handleError,

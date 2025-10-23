@@ -1,7 +1,7 @@
-import { PlusIcon } from 'lucide-react';
-import Link from 'next/link';
-import { memo } from 'react';
-import { Button } from './ui/button';
+import { PlusIcon } from "lucide-react";
+import Link from "next/link";
+import { memo } from "react";
+import { Button } from "./ui/button";
 
 type PureHeaderProps = {
   title: string;
@@ -35,13 +35,13 @@ export const PureHeader = ({
         )}
       </div>
       {onNew && !newButtonHref && (
-        <Button disabled={disabled || isCreating} onClick={onNew} size={'sm'}>
+        <Button disabled={disabled || isCreating} onClick={onNew} size={"sm"}>
           <PlusIcon className="size-4" />
           {newButtonLabel}
         </Button>
       )}
       {newButtonHref && !onNew && (
-        <Button size={'sm'} asChild>
+        <Button size={"sm"} asChild>
           <Link href={newButtonHref} prefetch>
             <PlusIcon className="size-4" />
             {newButtonLabel}

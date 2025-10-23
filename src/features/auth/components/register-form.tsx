@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -8,7 +8,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
+} from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -16,21 +16,21 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { signUp } from '@/lib/auth-client';
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { signUp } from "@/lib/auth-client";
 import {
   registerFormSchema,
   RegisterFormSchema,
-} from '@/lib/shared/schemas/auth';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader2, X } from 'lucide-react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { toast } from 'sonner';
+} from "@/lib/shared/schemas/auth";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2, X } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 export default function RegisterForm() {
   const [image, setImage] = useState<File | null>(null);
@@ -41,11 +41,11 @@ export default function RegisterForm() {
   const registerForm = useForm<RegisterFormSchema>({
     resolver: zodResolver(registerFormSchema),
     defaultValues: {
-      firstName: '',
-      lastName: '',
-      email: '',
-      password: '',
-      confirmPassword: ''
+      firstName: "",
+      lastName: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
     },
   });
 
@@ -62,13 +62,13 @@ export default function RegisterForm() {
   };
 
   const onSubmit = async (data: RegisterFormSchema) => {
-    console.log('Submitting form with data:', data);
+    console.log("Submitting form with data:", data);
     await signUp.email({
       email: data.email,
       password: data.password,
       name: `${data.firstName} ${data.lastName}`,
-      image: image ? await convertImageToBase64(image) : '',
-      callbackURL: '/',
+      image: image ? await convertImageToBase64(image) : "",
+      callbackURL: "/",
       fetchOptions: {
         onResponse: () => {
           setLoading(false);
@@ -80,7 +80,7 @@ export default function RegisterForm() {
           toast.error(ctx.error.message);
         },
         onSuccess: async () => {
-          router.push('/');
+          router.push("/");
         },
       },
     });
@@ -237,7 +237,7 @@ export default function RegisterForm() {
                 {loading ? (
                   <Loader2 size={16} className="animate-spin" />
                 ) : (
-                  'Create an account'
+                  "Create an account"
                 )}
               </Button>
             </div>
@@ -250,7 +250,7 @@ export default function RegisterForm() {
             Secured by <span className="text-orange-400">better-auth.</span>
           </p>
           <p className="text-center text-xs text-neutral-500">
-            Already have an account?{' '}
+            Already have an account?{" "}
             <Link href="/login" className="underline hover:text-blue-500">
               Sign in
             </Link>

@@ -1,4 +1,4 @@
-import { requireAuth } from '@/lib/utils';
+import { requireAuth } from "@/lib/utils";
 
 export default async function ExecutionPage() {
   await requireAuth();

@@ -1,14 +1,21 @@
-import db, { workflow } from '@/db';
-import { createTRPCRouter, premiumProcedure, protectedProcedure } from '@/trpc/init';
-import { and, eq } from 'drizzle-orm';
-import z from 'zod';
+import db, { workflow } from "@/db";
+import {
+  createTRPCRouter,
+  premiumProcedure,
+  protectedProcedure,
+} from "@/trpc/init";
+import { and, eq } from "drizzle-orm";
+import z from "zod";
 
 export const workflowsRouter = createTRPCRouter({
   create: premiumProcedure.mutation(async ({ ctx }) => {
-    return await db.insert(workflow).values({
-      name: 'new workflow',
-      userId: ctx.auth.user.id,
-    }).returning();
+    return await db
+      .insert(workflow)
+      .values({
+        name: "new workflow",
+        userId: ctx.auth.user.id,
+      })
+      .returning();
   }),
   remove: protectedProcedure
     .input(z.object({ id: z.string() }))

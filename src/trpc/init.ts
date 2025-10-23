@@ -1,14 +1,14 @@
-import { auth } from '@/lib/auth';
-import { polarClient } from '@/lib/polar';
-import { initTRPC, TRPCError } from '@trpc/server';
-import superjson from 'superjson';
-import { headers } from 'next/headers';
-import { cache } from 'react';
+import { auth } from "@/lib/auth";
+import { polarClient } from "@/lib/polar";
+import { initTRPC, TRPCError } from "@trpc/server";
+import superjson from "superjson";
+import { headers } from "next/headers";
+import { cache } from "react";
 export const createTRPCContext = cache(async () => {
   /**
    * @see: https://trpc.io/docs/server/context
    */
-  return { userId: 'user_123' };
+  return { userId: "user_123" };
 });
 // Avoid exporting the entire t-object
 // since it's not very descriptive.
@@ -29,7 +29,7 @@ export const protectedProcedure = baseProcedure.use(async ({ ctx, next }) => {
     headers: await headers(),
   });
   if (!session || !session.user) {
-    throw new TRPCError({ message: 'UnAuthorized', code: 'UNAUTHORIZED' });
+    throw new TRPCError({ message: "UnAuthorized", code: "UNAUTHORIZED" });
   }
   return next({ ctx: { ...ctx, auth: session } });
 });
@@ -44,7 +44,7 @@ export const premiumProcedure = protectedProcedure.use(
       !customer.activeSubscriptions ||
       customer.activeSubscriptions.length === 0
     ) {
-      throw new TRPCError({ message: 'Pro Only', code: 'FORBIDDEN' });
+      throw new TRPCError({ message: "Pro Only", code: "FORBIDDEN" });
     }
     return next({ ctx: { ...ctx, customer } });
   },

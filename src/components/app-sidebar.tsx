@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useHasActiveSubscription } from '@/features/subsctiptions/hooks/use-subscription';
-import { authClient, signOut } from '@/lib/auth-client';
+import { useHasActiveSubscription } from "@/features/subsctiptions/hooks/use-subscription";
+import { authClient, signOut } from "@/lib/auth-client";
 import {
   CreditCardIcon,
   FolderOpenIcon,
@@ -9,10 +9,10 @@ import {
   KeyIcon,
   LogOutIcon,
   StarIcon,
-} from 'lucide-react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+} from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Sidebar,
   SidebarContent,
@@ -23,26 +23,26 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from './ui/sidebar';
+} from "./ui/sidebar";
 
 const menuItems = [
   {
-    title: 'Workflows',
+    title: "Workflows",
     items: [
       {
-        title: 'Workflows',
+        title: "Workflows",
         icon: FolderOpenIcon,
-        url: '/workflows',
+        url: "/workflows",
       },
       {
-        title: 'Credentials',
+        title: "Credentials",
         icon: KeyIcon,
-        url: '/credentials',
+        url: "/credentials",
       },
       {
-        title: 'Executions',
+        title: "Executions",
         icon: HistoryIcon,
-        url: '/executions',
+        url: "/executions",
       },
     ],
   },
@@ -59,7 +59,7 @@ export function AppSidebar() {
       <SidebarHeader>
         <SidebarMenuItem>
           <SidebarMenuButton asChild className="h-10 gap-x-4 px-4">
-            <Link prefetch href={'/workflows'}>
+            <Link prefetch href={"/workflows"}>
               <Image
                 src="/logos/logo.svg"
                 alt="Nodebase"
@@ -80,8 +80,8 @@ export function AppSidebar() {
                     <SidebarMenuButton
                       tooltip={item.title}
                       isActive={
-                        item.url === '/'
-                          ? pathname === '/'
+                        item.url === "/"
+                          ? pathname === "/"
                           : pathname.startsWith(item.url)
                       }
                       asChild
@@ -104,9 +104,9 @@ export function AppSidebar() {
           {!hasActiveSubscription && !isLoading && (
             <SidebarMenuItem>
               <SidebarMenuButton
-                tooltip={'Upgrade to Pro'}
+                tooltip={"Upgrade to Pro"}
                 className="h-10 gap-x-4 px-4"
-                onClick={() => authClient.checkout({ slug: 'pro' })}
+                onClick={() => authClient.checkout({ slug: "pro" })}
               >
                 <StarIcon className="size-4" />
                 <span>Upgrade to Pro</span>
@@ -115,7 +115,7 @@ export function AppSidebar() {
           )}
           <SidebarMenuItem>
             <SidebarMenuButton
-              tooltip={'Billing Portal'}
+              tooltip={"Billing Portal"}
               className="h-10 gap-x-4 px-4"
               onClick={() => authClient.customer.portal()}
             >
@@ -125,13 +125,13 @@ export function AppSidebar() {
           </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton
-              tooltip={'Sign Out'}
+              tooltip={"Sign Out"}
               className="h-10 gap-x-4 px-4"
               onClick={() =>
                 signOut({
                   fetchOptions: {
                     onSuccess: () => {
-                      router.push('/login');
+                      router.push("/login");
                     },
                   },
                 })
