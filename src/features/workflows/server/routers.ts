@@ -25,7 +25,7 @@ export const workflowsRouter = createTRPCRouter({
         .delete(workflow)
         .where(
           and(eq(workflow.id, input.id), eq(workflow.userId, ctx.auth.user.id)),
-        );
+        ).returning();
     }),
   update: protectedProcedure
     .input(z.object({ id: z.string(), name: z.string().min(1) }))
