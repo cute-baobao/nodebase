@@ -15,6 +15,20 @@
       "when": 1761140254379,
       "tag": "0001_add_workflow",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1761464416647,
+      "tag": "0002_add_node_and_connection",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1761465582930,
+      "tag": "0003_add_node_name",
+      "breakpoints": true
     }
   ]
 }

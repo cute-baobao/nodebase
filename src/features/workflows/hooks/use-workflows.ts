@@ -38,7 +38,7 @@ export const useCreateWorkflow = () => {
   return useMutation(
     trpc.workflows.create.mutationOptions({
       onSuccess: (data) => {
-        toast.success(`Workflow ${data[0].name} created`);
+        toast.success(`Workflow ${data.name} created`);
         queryClient.invalidateQueries(trpc.workflows.getMany.queryOptions({}));
       },
       onError: (error) => {
@@ -68,10 +68,9 @@ export const useRemoveWorkflow = () => {
     }),
   );
 };
-
-/**
- * @description Hook to update a new workflow.
- * @returns A TRPC mutation for creating a new workflow.
+/*
+ * @description Hook to update an existing workflow.
+ * @returns A TRPC mutation for updating an existing workflow.
  */
 export const useUpdatedWorkflow = () => {
   const trpc = useTRPC();

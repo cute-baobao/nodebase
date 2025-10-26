@@ -44,7 +44,7 @@ export function WorkflowsHeader({ disabled }: { disabled?: boolean }) {
   const handleCreate = () => {
     createWorkflow.mutate(undefined, {
       onSuccess: (data) => {
-        router.push(`/workflows/${data[0].id}`);
+        router.push(`/workflows/${data.id}`);
       },
       onError: handleError,
     });
@@ -129,7 +129,7 @@ export function WorkflowEmpty() {
     createWorkflow.mutate(undefined, {
       onError: handleError,
       onSuccess: (data) => {
-        router.push(`/workflows/${data[0].id}`);
+        router.push(`/workflows/${data.id}`);
       },
     });
   };
