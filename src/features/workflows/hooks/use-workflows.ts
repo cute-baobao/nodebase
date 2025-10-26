@@ -19,6 +19,16 @@ export const useSuspenseWorkflows = () => {
 };
 
 /**
+ * @description Custom hook to fetch single workflows using suspense.
+ * @param id workflow id
+ * @returns A suspense query for fetching single workflows.
+ */
+export const useSuspenseSingleWorkflow = (id: string) => {
+  const trpc = useTRPC();
+  return useSuspenseQuery(trpc.workflows.getOne.queryOptions({ id }));
+};
+
+/**
  * @description Hook to create a new workflow.
  * @returns A TRPC mutation for creating a new workflow.
  */
@@ -54,6 +64,29 @@ export const useRemoveWorkflow = () => {
         queryClient.invalidateQueries(
           trpc.workflows.getOne.queryFilter({ id: data[0].id }),
         );
+      },
+    }),
+  );
+};
+
+/**
+ * @description Hook to update a new workflow.
+ * @returns A TRPC mutation for creating a new workflow.
+ */
+export const useUpdatedWorkflow = () => {
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
+  return useMutation(
+    trpc.workflows.update.mutationOptions({
+      onSuccess: (data) => {
+        toast.success(`Workflow ${data[0].name} updated`);
+        queryClient.invalidateQueries(trpc.workflows.getMany.queryOptions({}));
+        queryClient.invalidateQueries(
+          trpc.workflows.getOne.queryFilter({ id: data[0].id }),
+        );
+      },
+      onError: (error) => {
+        toast.error(`Failed to update workflow: ${error.message}`);
       },
     }),
   );

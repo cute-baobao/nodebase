@@ -5,6 +5,7 @@ import {
   premiumProcedure,
   protectedProcedure,
 } from "@/trpc/init";
+import { TRPCError } from "@trpc/server";
 import { and, desc, eq, ilike } from "drizzle-orm";
 import z from "zod";
 
@@ -25,7 +26,8 @@ export const workflowsRouter = createTRPCRouter({
         .delete(workflow)
         .where(
           and(eq(workflow.id, input.id), eq(workflow.userId, ctx.auth.user.id)),
-        ).returning();
+        )
+        .returning();
     }),
   update: protectedProcedure
     .input(z.object({ id: z.string(), name: z.string().min(1) }))
@@ -37,17 +39,25 @@ export const workflowsRouter = createTRPCRouter({
         })
         .where(
           and(eq(workflow.id, input.id), eq(workflow.userId, ctx.auth.user.id)),
-        );
+        )
+        .returning();
     }),
   getOne: protectedProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ ctx, input }) => {
-      return await db.query.workflow.findFirst({
+      const data = await db.query.workflow.findFirst({
         where: and(
           eq(workflow.id, input.id),
           eq(workflow.userId, ctx.auth.user.id),
         ),
       });
+      if (data === undefined) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `Workflow with id ${input.id} not found`,
+        });
+      }
+      return data;
     }),
   getMany: protectedProcedure
     .input(
