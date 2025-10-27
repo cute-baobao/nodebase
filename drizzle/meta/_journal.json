@@ -29,6 +29,13 @@
       "when": 1761465582930,
       "tag": "0003_add_node_name",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1761542526265,
+      "tag": "0004_add_two_node_type",
+      "breakpoints": true
     }
   ]
 }
