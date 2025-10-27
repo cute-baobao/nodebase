@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import {
   useSuspenseSingleWorkflow,
-  useUpdatedWorkflow,
+  useUpdatedWorkflowName,
 } from "@/features/workflows/hooks/use-workflows";
 import { SaveIcon } from "lucide-react";
 import Link from "next/link";
@@ -19,7 +19,7 @@ import React, { useEffect, useRef, useState } from "react";
 
 function EditorNameInput({ workflowId }: { workflowId: string }) {
   const { data: workflow } = useSuspenseSingleWorkflow(workflowId);
-  const updateWorkflowName = useUpdatedWorkflow();
+  const updateWorkflowName = useUpdatedWorkflowName();
 
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(workflow.name);

@@ -72,11 +72,11 @@ export const useRemoveWorkflow = () => {
  * @description Hook to update an existing workflow.
  * @returns A TRPC mutation for updating an existing workflow.
  */
-export const useUpdatedWorkflow = () => {
+export const useUpdatedWorkflowName = () => {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
   return useMutation(
-    trpc.workflows.update.mutationOptions({
+    trpc.workflows.updateName.mutationOptions({
       onSuccess: (data) => {
         toast.success(`Workflow ${data[0].name} updated`);
         queryClient.invalidateQueries(trpc.workflows.getMany.queryOptions({}));
