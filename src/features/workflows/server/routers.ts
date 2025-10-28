@@ -60,41 +60,45 @@ export const workflowsRouter = createTRPCRouter({
       return await db.transaction(async (tx) => {
         await tx.delete(node).where(eq(node.workflowId, data.id));
 
-        await tx
-          .insert(node)
-          .values(
-            nodes.map((node) => ({
-              id: node.id,
-              type: node.type as NodeType,
-              workflowId: id,
-              position: node.position,
-              data: node.data,
-              name: node.type || "Unnamed Node",
-            })),
-          )
-          .onConflictDoNothing();
+        if (nodes.length > 0) {
+          await tx
+            .insert(node)
+            .values(
+              nodes.map((node) => ({
+                id: node.id,
+                type: node.type as NodeType,
+                workflowId: id,
+                position: node.position,
+                data: node.data,
+                name: node.type || "Unnamed Node",
+              })),
+            )
+            .onConflictDoNothing();
+        }
 
         await tx.delete(connection).where(eq(connection.workflowId, data.id));
 
-        await tx
-          .insert(connection)
-          .values(
-            edges.map((edge) => ({
-              workflowId: id,
-              fromNodeId: edge.source,
-              toNodeId: edge.target,
-              fromOutput: edge.sourceHandle || "main",
-              toInput: edge.targetHandle || "main",
-            })),
-          )
-          .onConflictDoNothing();
-        
+        if (edges.length > 0) {
+          await tx
+            .insert(connection)
+            .values(
+              edges.map((edge) => ({
+                workflowId: id,
+                fromNodeId: edge.source,
+                toNodeId: edge.target,
+                fromOutput: edge.sourceHandle || "main",
+                toInput: edge.targetHandle || "main",
+              })),
+            )
+            .onConflictDoNothing();
+        }
+
         await tx
           .update(workflow)
           .set({ updatedAt: new Date() })
           .where(eq(workflow.id, data.id));
 
-        return data
+        return data;
       });
     }),
   updateName: protectedProcedure
@@ -189,6 +193,7 @@ export const workflowsRouter = createTRPCRouter({
     }),
 });
 
+// 提取出常用的数据库操作
 class WorkflowDb {
   static async getOne({
     workflowId,

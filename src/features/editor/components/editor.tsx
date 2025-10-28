@@ -19,7 +19,9 @@ import {
   type NodeChange,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
+import { useSetAtom } from "jotai";
 import { useCallback, useState } from "react";
+import { editorAtom } from "../store/atoms";
 import { AddNodeButton } from "./add-node-button";
 
 export function EditorLoading() {
@@ -32,6 +34,8 @@ export function EditorError() {
 
 export function Editor({ workflowId }: { workflowId: string }) {
   const { data: workflow } = useSuspenseSingleWorkflow(workflowId);
+
+  const setEditor = useSetAtom(editorAtom);
 
   const [nodes, setNodes] = useState<Node[]>(workflow.nodes);
   const [edges, setEdges] = useState<Edge[]>(workflow.edges);
@@ -61,13 +65,16 @@ export function Editor({ workflowId }: { workflowId: string }) {
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         fitView
+        onInit={setEditor}
         nodeTypes={nodeComponents}
+        snapGrid={[10, 10]}
+        snapToGrid
       >
         <Background />
         <Controls />
         <MiniMap />
         <Panel position="top-right">
-          <AddNodeButton/>
+          <AddNodeButton />
         </Panel>
       </ReactFlow>
     </div>
