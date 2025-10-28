@@ -12,14 +12,18 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import {
   useSuspenseSingleWorkflow,
   useUpdatedWorkflow,
+  useUpdatedWorkflowName,
 } from "@/features/workflows/hooks/use-workflows";
+import { useAtomValue } from "jotai";
 import { SaveIcon } from "lucide-react";
 import Link from "next/link";
-import React, { useEffect, useRef, useState } from "react";
+import { createContext, use, useEffect, useRef, useState } from "react";
+import { editorAtom } from "../store/atoms";
 
-function EditorNameInput({ workflowId }: { workflowId: string }) {
+function EditorNameInput() {
+  const { workflowId } = use(EditorHeaderContext);
   const { data: workflow } = useSuspenseSingleWorkflow(workflowId);
-  const updateWorkflowName = useUpdatedWorkflow();
+  const updateWorkflowName = useUpdatedWorkflowName();
 
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(workflow.name);
@@ -89,7 +93,8 @@ function EditorNameInput({ workflowId }: { workflowId: string }) {
   );
 }
 
-export function EditorBreadcrumbs({ workflowId }: { workflowId: string }) {
+export function EditorBreadcrumbs() {
+  const { workflowId } = use(EditorHeaderContext);
   return (
     <Breadcrumb>
       <BreadcrumbList>
@@ -101,16 +106,32 @@ export function EditorBreadcrumbs({ workflowId }: { workflowId: string }) {
           </BreadcrumbLink>
         </BreadcrumbItem>
         <BreadcrumbSeparator />
-        <EditorNameInput workflowId={workflowId} />
+        <EditorNameInput />
       </BreadcrumbList>
     </Breadcrumb>
   );
 }
 
-export function EditorSaveButton({ workflowId }: { workflowId: string }) {
+export function EditorSaveButton() {
+  const { workflowId } = use(EditorHeaderContext);
+  const editor = useAtomValue(editorAtom);
+  const saveWorkflow = useUpdatedWorkflow();
+
+  const handleSave = async () => {
+    if (!editor) return;
+    const nodes = editor.getNodes();
+    const edges = editor.getEdges();
+
+    saveWorkflow.mutate({
+      id: workflowId,
+      nodes,
+      edges,
+    });
+  };
+
   return (
     <div className="ml-auto">
-      <Button size="sm" onClick={() => {}} disabled={false}>
+      <Button size="sm" onClick={handleSave} disabled={saveWorkflow.isPending}>
         <SaveIcon className="size-4" />
         Save
       </Button>
@@ -118,14 +139,20 @@ export function EditorSaveButton({ workflowId }: { workflowId: string }) {
   );
 }
 
+const EditorHeaderContext = createContext({
+  workflowId: "",
+});
+
 export function EditorHeader({ workflowId }: { workflowId: string }) {
   return (
-    <header className="flex h-14 shrink-0 items-center gap-2 border-b px-4">
-      <SidebarTrigger />
-      <div className="flex w-full flex-row items-center justify-between gap-x-4">
-        <EditorBreadcrumbs workflowId={workflowId} />
-        <EditorSaveButton workflowId={workflowId} />
-      </div>
-    </header>
+    <EditorHeaderContext.Provider value={{ workflowId }}>
+      <header className="flex h-14 shrink-0 items-center gap-2 border-b px-4">
+        <SidebarTrigger />
+        <div className="flex w-full flex-row items-center justify-between gap-x-4">
+          <EditorBreadcrumbs />
+          <EditorSaveButton />
+        </div>
+      </header>
+    </EditorHeaderContext.Provider>
   );
 }

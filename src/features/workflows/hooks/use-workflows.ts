@@ -38,7 +38,7 @@ export const useCreateWorkflow = () => {
   return useMutation(
     trpc.workflows.create.mutationOptions({
       onSuccess: (data) => {
-        toast.success(`Workflow ${data[0].name} created`);
+        toast.success(`Workflow ${data.name} created`);
         queryClient.invalidateQueries(trpc.workflows.getMany.queryOptions({}));
       },
       onError: (error) => {
@@ -68,16 +68,15 @@ export const useRemoveWorkflow = () => {
     }),
   );
 };
-
-/**
- * @description Hook to update a new workflow.
- * @returns A TRPC mutation for creating a new workflow.
+/*
+ * @description Hook to update an existing workflow.
+ * @returns A TRPC mutation for updating an existing workflow.
  */
-export const useUpdatedWorkflow = () => {
+export const useUpdatedWorkflowName = () => {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
   return useMutation(
-    trpc.workflows.update.mutationOptions({
+    trpc.workflows.updateName.mutationOptions({
       onSuccess: (data) => {
         toast.success(`Workflow ${data[0].name} updated`);
         queryClient.invalidateQueries(trpc.workflows.getMany.queryOptions({}));
@@ -87,6 +86,30 @@ export const useUpdatedWorkflow = () => {
       },
       onError: (error) => {
         toast.error(`Failed to update workflow: ${error.message}`);
+      },
+    }),
+  );
+};
+
+/*
+ * @description Hook to update a workflow.
+ * @returns A TRPC mutation for updating a workflow.
+ */
+export const useUpdatedWorkflow = () => {
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
+
+  return useMutation(
+    trpc.workflows.update.mutationOptions({
+      onSuccess: (data) => {
+        toast.success(`Workflow ${data.name} updated`);
+        queryClient.invalidateQueries(trpc.workflows.getMany.queryOptions({}));
+        queryClient.invalidateQueries(
+          trpc.workflows.getOne.queryFilter({ id: data.id }),
+        );
+      },
+      onError: (error) => {
+        toast.error(`Failed to save workflow: ${error.message}`);
       },
     }),
   );

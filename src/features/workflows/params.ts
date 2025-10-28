@@ -1,4 +1,4 @@
-import { PAGINATION } from "@/lib/configs/constans";
+import { PAGINATION } from "@/lib/configs/constants";
 import { parseAsInteger, parseAsString } from "nuqs/server";
 
 export const workflowsParams = {

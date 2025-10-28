@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react";
-import { PAGINATION } from "../configs/constans";
+import { PAGINATION } from "../configs/constants";
 
 interface useEntitySearchProps<T extends { search: string; page: number }> {
   params: T;
   setParams: (params: T) => void;
-  debouncsMs?: number;
+  debounceMs?: number;
 }
 
 export function useEntitySearch<T extends { search: string; page: number }>({
   params,
   setParams,
-  debouncsMs = 300,
+  debounceMs = 300,
 }: useEntitySearchProps<T>) {
   const [localSearch, setLocalSearch] = useState(params.search);
 
@@ -32,10 +32,10 @@ export function useEntitySearch<T extends { search: string; page: number }>({
           page: PAGINATION.DEFAULT_PAGE,
         });
       }
-    }, debouncsMs);
+    }, debounceMs);
 
     return () => clearTimeout(timer);
-  }, [localSearch, params, setParams, debouncsMs]);
+  }, [localSearch, params, setParams, debounceMs]);
 
   useEffect(() => {
     setLocalSearch(params.search);
