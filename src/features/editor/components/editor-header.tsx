@@ -17,7 +17,7 @@ import {
 import { useAtomValue } from "jotai";
 import { SaveIcon } from "lucide-react";
 import Link from "next/link";
-import React, { createContext, use, useEffect, useRef, useState } from "react";
+import { createContext, use, useEffect, useRef, useState } from "react";
 import { editorAtom } from "../store/atoms";
 
 function EditorNameInput() {

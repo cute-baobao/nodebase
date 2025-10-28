@@ -6,20 +6,20 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-interface ManualTirggerDialogProps {
+interface ManualTriggerDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-export function ManualTirggerDialog({
+export function ManualTriggerDialog({
   open,
   onOpenChange,
-}: ManualTirggerDialogProps) {
+}: ManualTriggerDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Manual Tirgger</DialogTitle>
+          <DialogTitle>Manual Trigger</DialogTitle>
           <DialogDescription>
             Configure settings for the manual trigger node
           </DialogDescription>

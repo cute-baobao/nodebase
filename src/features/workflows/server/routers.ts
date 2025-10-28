@@ -212,7 +212,7 @@ class WorkflowDb {
     if (data === undefined) {
       throw new TRPCError({
         code: "NOT_FOUND",
-        message: `Workflow with id ${workflow} not found`,
+        message: `Workflow with id ${workflowId} not found`,
       });
     }
     return data;

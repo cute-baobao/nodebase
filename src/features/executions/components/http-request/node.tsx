@@ -46,7 +46,7 @@ function PureHttpRequestNode(props: NodeProps<HttpRequestNodeType>) {
         });
       });
     },
-    [setNodes],
+    [setNodes, props.id],
   );
 
   return (

@@ -2,7 +2,7 @@ import { NodeProps } from "@xyflow/react";
 import { MousePointerIcon } from "lucide-react";
 import { memo, useCallback, useState } from "react";
 import { BaseTriggerNode } from "../base-trigger-node";
-import { ManualTirggerDialog } from "./dialog";
+import { ManualTriggerDialog } from "./dialog";
 
 export function PureManualTriggerNode(props: NodeProps) {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -14,7 +14,7 @@ export function PureManualTriggerNode(props: NodeProps) {
 
   return (
     <>
-      <ManualTirggerDialog open={dialogOpen} onOpenChange={setDialogOpen} />
+      <ManualTriggerDialog open={dialogOpen} onOpenChange={setDialogOpen} />
       <BaseTriggerNode
         {...props}
         icon={MousePointerIcon}
