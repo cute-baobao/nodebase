@@ -23,6 +23,7 @@ import { useSetAtom } from "jotai";
 import { useCallback, useState } from "react";
 import { editorAtom } from "../store/atoms";
 import { AddNodeButton } from "./add-node-button";
+import { FormatLayoutButton } from "./format-layout-button";
 
 export function EditorLoading() {
   return <LoadingView message="Loading editor..." />;
@@ -73,8 +74,9 @@ export function Editor({ workflowId }: { workflowId: string }) {
         <Background />
         <Controls />
         <MiniMap />
-        <Panel position="top-right">
+        <Panel className="flex flex-col gap-2" position="top-right">
           <AddNodeButton />
+          <FormatLayoutButton />
         </Panel>
       </ReactFlow>
     </div>

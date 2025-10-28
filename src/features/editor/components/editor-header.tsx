@@ -94,7 +94,6 @@ function EditorNameInput() {
 }
 
 export function EditorBreadcrumbs() {
-  const { workflowId } = use(EditorHeaderContext);
   return (
     <Breadcrumb>
       <BreadcrumbList>

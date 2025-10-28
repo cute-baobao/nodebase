@@ -1,6 +1,6 @@
 import db, { connection, node, NodeType, NodeTypeValues, workflow } from "@/db";
 import { PAGINATION } from "@/lib/configs/constants";
-import { edgeSchema, nodeSchema } from "@/lib/shared/workflow";
+import { edgeSchema, nodeSchema } from "@/lib/shared/schemas/workflow";
 import {
   createTRPCRouter,
   premiumProcedure,
