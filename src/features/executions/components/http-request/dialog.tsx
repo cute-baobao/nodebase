@@ -28,9 +28,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useCallback, useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";
-import z from "zod";
 import { HttpRequestData, httpRequestDataSchema } from "./schema";
-
 
 interface HttpRequestDialogProps {
   open: boolean;
@@ -48,12 +46,18 @@ export function HttpRequestDialog({
   const form = useForm<HttpRequestData>({
     resolver: zodResolver(httpRequestDataSchema),
     defaultValues: {
+      variableName: defaultValues.variableName || "",
       endpoint: defaultValues.endpoint || "",
       method: defaultValues.method || "GET",
       body: defaultValues.body || "",
     },
   });
 
+  const watchVariableName =
+    useWatch({
+      control: form.control,
+      name: "variableName",
+    }) || "myApiCall";
   const watchMethod = useWatch({ control: form.control, name: "method" });
   const showBodyField = ["POST", "PUT", "PATCH"].includes(watchMethod);
 
@@ -69,6 +73,7 @@ export function HttpRequestDialog({
   useEffect(() => {
     if (open) {
       form.reset({
+        variableName: defaultValues.variableName || "",
         endpoint: defaultValues.endpoint || "",
         method: defaultValues.method || "GET",
         body: defaultValues.body || "",
@@ -90,6 +95,26 @@ export function HttpRequestDialog({
             className="mt-4 space-y-8"
             onSubmit={form.handleSubmit(handleSubmit)}
           >
+            <FormField
+              control={form.control}
+              name="variableName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Variable Name</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      placeholder="myApiCall"
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    Use this name to reference the result in other node:{" "}
+                    {`{{${watchVariableName}.httpResponse.data}}`}
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="method"

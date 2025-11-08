@@ -3,8 +3,15 @@ import { GlobeIcon } from "lucide-react";
 import { memo, useCallback, useState } from "react";
 import { BaseExecutionNode } from "../base-execution-node";
 import { HttpRequestDialog } from "./dialog";
-import { HttpRequestData, HttpRequestNodeType } from "./schema";
 
+type HttpRequestNodeData = {
+  variableName?: string;
+  endpoint?: string;
+  method?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
+  body?: string | undefined;
+};
+
+type HttpRequestNodeType = Node<HttpRequestNodeData>;
 
 function PureHttpRequestNode(props: NodeProps<HttpRequestNodeType>) {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -22,7 +29,7 @@ function PureHttpRequestNode(props: NodeProps<HttpRequestNodeType>) {
   const nodeStatus = "initial";
 
   const handleSubmit = useCallback(
-    (values: HttpRequestData) => {
+    (values: HttpRequestNodeData) => {
       setNodes((nodes) => {
         return nodes.map((node) => {
           if (node.id === props.id)
