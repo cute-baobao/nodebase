@@ -1,6 +1,7 @@
 import { NodeType, NodeTypeValues } from "@/db";
 import { useReactFlow } from "@xyflow/react";
 import { GlobeIcon, MousePointerIcon } from "lucide-react";
+import Image from "next/image";
 import React, { useCallback } from "react";
 import { toast } from "sonner";
 import { v4 as createID } from "uuid";
@@ -117,9 +118,13 @@ export function NodeSelector({
               >
                 <div className="flex w-full items-center gap-6 overflow-hidden">
                   {typeof Icon === "string" ? (
-                    <img
+                    <Image
                       src={Icon}
-                      className="size-5 rounded-sm object-contain"
+                      alt={node.label}
+                      width={20}
+                      height={20}
+                      objectFit="contain"
+                      className="rounded-sm"
                     />
                   ) : (
                     <Icon className="size-5 rounded-sm object-contain" />
@@ -147,9 +152,13 @@ export function NodeSelector({
               >
                 <div className="flex w-full items-center gap-6 overflow-hidden">
                   {typeof Icon === "string" ? (
-                    <img
+                    <Image
                       src={Icon}
-                      className="size-5 rounded-sm object-contain"
+                      alt={node.label}
+                      width={20}
+                      height={20}
+                      objectFit="contain"
+                      className="rounded-sm"
                     />
                   ) : (
                     <Icon className="size-5 rounded-sm object-contain" />

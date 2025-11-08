@@ -17,7 +17,6 @@ function PureFormatLayoutButton() {
   const handleFormat = useCallback(() => {
     const nodes = getNodes();
     const edges = getEdges();
-    console.log("当前节点和连线:", nodes, edges);
     if (nodes.length === 0) {
       return;
     }
@@ -35,7 +34,7 @@ function PureFormatLayoutButton() {
         },
       },
     );
-  }, []);
+  }, [getNodes, getEdges, setNodes, setEdges, fitView, mutate]);
   return (
     <Tooltip>
       <TooltipTrigger asChild>

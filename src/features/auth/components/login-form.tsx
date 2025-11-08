@@ -191,7 +191,7 @@ export default function LoginForm() {
             Secured by <span className="text-orange-400">better-auth.</span>
           </p>
           <p className="text-center text-xs text-neutral-500">
-            Don't have an account?{" "}
+            Don{"`"}t have an account?{" "}
             <Link href="/register" className="underline hover:text-blue-500">
               Sign up
             </Link>

@@ -27,7 +27,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useCallback, useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import z from "zod";
 
 const httpRequestFormSchema = z.object({
@@ -64,7 +64,7 @@ export function HttpRequestDialog({
     },
   });
 
-  const watchMethod = form.watch("method");
+  const watchMethod = useWatch({control: form.control, name: "method"});
   const showBodyField = ["POST", "PUT", "PATCH"].includes(watchMethod);
 
   const handleSubmit = useCallback(
@@ -84,7 +84,7 @@ export function HttpRequestDialog({
         body: defaultBody,
       });
     }
-  }, [open, defaultEndPoint, defaultMethod, defaultBody]);
+  }, [open, defaultEndPoint, defaultMethod, defaultBody, form]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
