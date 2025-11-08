@@ -29,46 +29,36 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useCallback, useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import z from "zod";
+import { HttpRequestData, httpRequestDataSchema } from "./schema";
 
-const httpRequestFormSchema = z.object({
-  endPoint: z.url({ message: "Please enter a valid URL" }),
-  method: z.enum(["GET", "POST", "PUT", "DELETE", "PATCH"]),
-  body: z.string().optional(),
-});
-
-export type HttpRequestForm = z.infer<typeof httpRequestFormSchema>;
 
 interface HttpRequestDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (data: z.infer<typeof httpRequestFormSchema>) => void;
-  defaultEndPoint?: string;
-  defaultMethod?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
-  defaultBody?: string;
+  onSubmit: (data: HttpRequestData) => void;
+  defaultValues: Partial<HttpRequestData>;
 }
 
 export function HttpRequestDialog({
   open,
   onOpenChange,
   onSubmit,
-  defaultEndPoint = "",
-  defaultMethod = "GET",
-  defaultBody = "",
+  defaultValues = {},
 }: HttpRequestDialogProps) {
-  const form = useForm<HttpRequestForm>({
-    resolver: zodResolver(httpRequestFormSchema),
+  const form = useForm<HttpRequestData>({
+    resolver: zodResolver(httpRequestDataSchema),
     defaultValues: {
-      endPoint: defaultEndPoint,
-      method: defaultMethod,
-      body: defaultBody,
+      endpoint: defaultValues.endpoint || "",
+      method: defaultValues.method || "GET",
+      body: defaultValues.body || "",
     },
   });
 
-  const watchMethod = useWatch({control: form.control, name: "method"});
+  const watchMethod = useWatch({ control: form.control, name: "method" });
   const showBodyField = ["POST", "PUT", "PATCH"].includes(watchMethod);
 
   const handleSubmit = useCallback(
-    (data: HttpRequestForm) => {
+    (data: HttpRequestData) => {
       onSubmit(data);
       onOpenChange(false);
     },
@@ -79,12 +69,12 @@ export function HttpRequestDialog({
   useEffect(() => {
     if (open) {
       form.reset({
-        endPoint: defaultEndPoint,
-        method: defaultMethod,
-        body: defaultBody,
+        endpoint: defaultValues.endpoint || "",
+        method: defaultValues.method || "GET",
+        body: defaultValues.body || "",
       });
     }
-  }, [open, defaultEndPoint, defaultMethod, defaultBody, form]);
+  }, [open, defaultValues, form]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -132,7 +122,7 @@ export function HttpRequestDialog({
             />
             <FormField
               control={form.control}
-              name="endPoint"
+              name="endpoint"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Endpoint URL</FormLabel>

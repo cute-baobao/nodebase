@@ -10,3 +10,7 @@ WARN [mprocs::app] Ignore input event: FocusGained
 WARN [mprocs::app] Ignore input event: FocusLost
 WARN [mprocs::app] Ignore input event: FocusGained
 WARN [mprocs::app] Ignore input event: FocusLost
+ERROR [portable_pty::win::psuedocon] CreateProcessW `"D:\\nodejs\\npx inngest-cli dev\0"` in cwd `Some("E:\\data\\nextjs\\nodebase\0")` failed: %1 不是有效的 Win32 应用程序。 (os error 193)
+ERROR [portable_pty::win::psuedocon] CreateProcessW `"D:\\nodejs\\npm run dev\0"` in cwd `Some("E:\\data\\nextjs\\nodebase\0")` failed: %1 不是有效的 Win32 应用程序。 (os error 193)
+ERROR [mprocs::error] Error: channel closed
+ERROR [mprocs::error] Error: channel closed

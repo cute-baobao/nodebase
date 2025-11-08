@@ -6,7 +6,7 @@ import { ManualTriggerDialog } from "./dialog";
 
 export function PureManualTriggerNode(props: NodeProps) {
   const [dialogOpen, setDialogOpen] = useState(false);
-  const nodeStatus = "loading";
+  const nodeStatus = "initial";
 
   const handleOpenSetting = useCallback(() => {
     setDialogOpen(true);

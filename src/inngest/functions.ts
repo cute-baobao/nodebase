@@ -1,37 +1,40 @@
-import { google } from "@ai-sdk/google";
-
-import { generateText } from "ai";
+import { NodeType } from "@/db";
+import { getExecutor } from "@/features/executions/components/lib/executor-registry";
+import { WorkflowDb } from "@/features/workflows/server/routers";
+import { NonRetriableError } from "inngest";
 import { inngest } from "./client";
-export const helloWorld = inngest.createFunction(
-  {
-    id: "hello-world",
-  },
-  {
-    event: "test/hello.world",
-  },
-  async ({ event, step }) => {
-    await step.sleep("waiting 1 second", 1000);
-    return { message: `Hello, ${event.data.email}` };
-  },
-);
+import { topologicalSort } from "./utils";
 
-export const ai = inngest.createFunction(
-  {
-    id: "execute-ai",
-  },
-  { event: "execute/ai" },
+export const executeWorkflow = inngest.createFunction(
+  { id: "execute-workflow" },
+  { event: "workflows/execute.workflow" },
   async ({ event, step }) => {
-    await step.sleep("simulating AI processing", 2000);
+    const workflowId = event.data.workflowId;
 
-    const { steps } = await step.ai.wrap("gemini ai gogogo", generateText, {
-      model: google("gemini-2.5-flash"),
-      prompt: "say gogogo",
-      experimental_telemetry: {
-        isEnabled: true,
-        recordInputs: true,
-        recordOutputs: true,
-      },
+    if (!workflowId) {
+      throw new NonRetriableError("No workflow ID provided");
+    }
+
+    await step.sleep("test", "5s");
+
+    const sortedNodes = await step.run("prepare-workflow", async () => {
+      const flow = await WorkflowDb.getOneWithoutUser({ workflowId });
+      return topologicalSort(flow.nodes, flow.connections);
     });
-    return { steps };
+
+    // Initialize the context with any initial data from the trigger
+    let context = event.data.initialData || {};
+
+    for (const node of sortedNodes) {
+      const executor = getExecutor(node.type as NodeType);
+      context = await executor({
+        data: node.data as Record<string, unknown>,
+        nodeId: node.id,
+        context,
+        step,
+      });
+    }
+
+    return { workflowId, result: context };
   },
 );
