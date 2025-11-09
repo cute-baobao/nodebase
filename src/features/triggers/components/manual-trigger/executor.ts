@@ -1,4 +1,5 @@
-import { NodeExecutor } from "@/features/executions/components/type";
+import { NodeExecutor } from "@/features/executions/type";
+import { manualTriggerChannel } from "@/inngest/channels/manual-trigger";
 
 type ManualTriggerData = Record<string, unknown>;
 
@@ -7,10 +8,32 @@ export const manualTriggerExecutor: NodeExecutor<ManualTriggerData> = async ({
   nodeId,
   context,
   step,
+  publish,
 }) => {
-  // TODO: Publish loading state for manual trigger node
-  const result = await step.run("manual-trigger", async () => context);
+  try {
+    await publish(
+      manualTriggerChannel().status({
+        nodeId,
+        status: "loading",
+      }),
+    );
 
-  // TODO: Publish success state for manual trigger node
-  return result;
+    const result = await step.run("manual-trigger", async () => context);
+
+    await publish(
+      manualTriggerChannel().status({
+        nodeId,
+        status: "success",
+      }),
+    );
+    return result;
+  } catch (error) {
+    await publish(
+      manualTriggerChannel().status({
+        nodeId,
+        status: "error",
+      }),
+    );
+    throw error;
+  }
 };

@@ -1,14 +1,19 @@
 import { NodeType } from "@/db";
-import { getExecutor } from "@/features/executions/components/lib/executor-registry";
+import { getExecutor } from "@/features/executions/lib/executor-registry";
 import { WorkflowDb } from "@/features/workflows/server/routers";
 import { NonRetriableError } from "inngest";
+import { httpRequestChannel } from "./channels/http-request";
+import { manualTriggerChannel } from "./channels/manual-trigger";
 import { inngest } from "./client";
 import { topologicalSort } from "./utils";
 
 export const executeWorkflow = inngest.createFunction(
   { id: "execute-workflow" },
-  { event: "workflows/execute.workflow" },
-  async ({ event, step }) => {
+  {
+    event: "workflows/execute.workflow",
+    channels: [httpRequestChannel(), manualTriggerChannel()],
+  },
+  async ({ event, step, publish }) => {
     const workflowId = event.data.workflowId;
 
     if (!workflowId) {
@@ -32,6 +37,7 @@ export const executeWorkflow = inngest.createFunction(
         nodeId: node.id,
         context,
         step,
+        publish,
       });
     }
 

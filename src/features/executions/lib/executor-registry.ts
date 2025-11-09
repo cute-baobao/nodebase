@@ -1,7 +1,7 @@
 import { NodeType, NodeTypeValues } from "@/db";
 import { manualTriggerExecutor } from "@/features/triggers/components/manual-trigger/executor";
 import { NodeExecutor } from "../type";
-import { httpRequestExecutor } from "../http-request/executor";
+import { httpRequestExecutor } from "../components/http-request/executor";
 
 export const executeRegistry: Record<NodeType, NodeExecutor> = {
   // INITIAL
