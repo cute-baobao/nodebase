@@ -1,7 +1,14 @@
 import { NodeExecutor } from "@/features/executions/components/type";
+import Handlebars from "handlebars";
 import { NonRetriableError } from "inngest";
 import ky, { type Options as KyOptions } from "ky";
 import { HttpRequestData, httpRequestDataSchema } from "./schema";
+
+Handlebars.registerHelper("json", (context) => {
+  const jsonString = JSON.stringify(context);
+  const safeString = new Handlebars.SafeString(jsonString);
+  return safeString;
+});
 
 export const httpRequestExecutor: NodeExecutor<HttpRequestData> = async ({
   data,
@@ -18,13 +25,21 @@ export const httpRequestExecutor: NodeExecutor<HttpRequestData> = async ({
   // TODO: Publish loading state for HTTP request node
   const result = await step.run("http-request", async () => {
     const method = safeData.data.method;
-    const endpoint = safeData.data.endpoint;
+    const endpoint = Handlebars.compile(safeData.data.endpoint)(context);
 
     const options: KyOptions = {
       method,
     };
     if (["POST", "PUT", "PATCH"].includes(method)) {
-      options.body = safeData.data.body;
+      const resolved = Handlebars.compile(safeData.data.body)(context);
+      try {
+        JSON.parse(resolved); // Validate JSON
+      } catch (e) {
+        throw new NonRetriableError(
+          `Invalid JSON body for HTTP Request node: ${e instanceof Error ? e.message : String(e)}`,
+        );
+      }
+      options.body = resolved;
       options.headers = {
         "Content-Type": "application/json",
       };
