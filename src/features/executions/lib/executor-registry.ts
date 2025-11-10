@@ -1,7 +1,8 @@
 import { NodeType, NodeTypeValues } from "@/db";
+import { GoogleFormTriggerExecutor } from "@/features/triggers/components/google-form-trigger/executor";
 import { manualTriggerExecutor } from "@/features/triggers/components/manual-trigger/executor";
-import { NodeExecutor } from "../type";
 import { httpRequestExecutor } from "../components/http-request/executor";
+import { NodeExecutor } from "../type";
 
 export const executeRegistry: Record<NodeType, NodeExecutor> = {
   // INITIAL
@@ -10,6 +11,8 @@ export const executeRegistry: Record<NodeType, NodeExecutor> = {
   [NodeTypeValues[1]]: manualTriggerExecutor,
   // HTTP_REQUEST
   [NodeTypeValues[2]]: httpRequestExecutor,
+  // GOOGLE_FORM_TRIGGER
+  [NodeTypeValues[3]]: GoogleFormTriggerExecutor,
 };
 
 export const getExecutor = (type: NodeType): NodeExecutor => {

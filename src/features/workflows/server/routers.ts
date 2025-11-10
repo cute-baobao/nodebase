@@ -1,5 +1,6 @@
 import db, { connection, node, NodeType, NodeTypeValues, workflow } from "@/db";
 import { inngest } from "@/inngest/client";
+import { sendWorkflowExecution } from "@/inngest/utils";
 import { PAGINATION } from "@/lib/configs/constants";
 import { edgeSchema, nodeSchema } from "@/lib/shared/schemas/workflow";
 import {
@@ -22,10 +23,9 @@ export const workflowsRouter = createTRPCRouter({
         userId: ctx.auth.user.id,
       });
 
-      await inngest.send({
-        name: "workflows/execute.workflow",
-        data: { workflowId: id },
-      });
+      await sendWorkflowExecution({
+        workflowId: workflow.id,
+      })
 
       return workflow;
     }),

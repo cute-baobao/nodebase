@@ -2,8 +2,11 @@ import { NodeType } from "@/db";
 import { getExecutor } from "@/features/executions/lib/executor-registry";
 import { WorkflowDb } from "@/features/workflows/server/routers";
 import { NonRetriableError } from "inngest";
-import { httpRequestChannel } from "./channels/http-request";
-import { manualTriggerChannel } from "./channels/manual-trigger";
+import {
+  googleFormTriggerChannel,
+  httpRequestChannel,
+  manualTriggerChannel,
+} from "./channels";
 import { inngest } from "./client";
 import { topologicalSort } from "./utils";
 
@@ -11,7 +14,11 @@ export const executeWorkflow = inngest.createFunction(
   { id: "execute-workflow" },
   {
     event: "workflows/execute.workflow",
-    channels: [httpRequestChannel(), manualTriggerChannel()],
+    channels: [
+      httpRequestChannel(),
+      manualTriggerChannel(),
+      googleFormTriggerChannel(),
+    ],
   },
   async ({ event, step, publish }) => {
     const workflowId = event.data.workflowId;

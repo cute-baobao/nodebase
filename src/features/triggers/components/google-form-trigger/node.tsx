@@ -1,11 +1,19 @@
+import { useNodeStatus } from "@/features/executions/hooks/use-node-status";
+import { GOOGLE_FORM_TRIGGER_CHANNEL_NAME } from "@/inngest/channels";
 import { NodeProps } from "@xyflow/react";
 import { memo, useCallback, useState } from "react";
 import { BaseTriggerNode } from "../base-trigger-node";
+import { fetchGoogleFormTriggerRealtimeToken } from "./actions";
 import { GoogleFormTriggerDialog } from "./dialog";
 
 export function PureGoogleFormTrigger(props: NodeProps) {
   const [dialogOpen, setDialogOpen] = useState(false);
-  const nodeStatus = "initial";
+  const nodeStatus = useNodeStatus({
+    nodeId: props.id,
+    channel: GOOGLE_FORM_TRIGGER_CHANNEL_NAME,
+    topic: "status",
+    refreshToken: fetchGoogleFormTriggerRealtimeToken,
+  });
   const handleOpenSetting = useCallback(() => {
     setDialogOpen(true);
   }, [setDialogOpen]);
@@ -28,4 +36,4 @@ export function PureGoogleFormTrigger(props: NodeProps) {
 
 export const GoogleFormTrigger = memo(PureGoogleFormTrigger);
 
-GoogleFormTrigger.displayName = "ManualTriggerNode";
+GoogleFormTrigger.displayName = "GoogleFormTriggerNode";

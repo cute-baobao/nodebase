@@ -1,17 +1,17 @@
 "use server";
 
-import { manualTriggerChannel } from "@/inngest/channels/manual-trigger";
+import { googleFormTriggerChannel } from "@/inngest/channels";
 import { inngest } from "@/inngest/client";
 import { getSubscriptionToken, Realtime } from "@inngest/realtime";
 
-export type ManualTriggerToken = Realtime.Token<
-  typeof manualTriggerChannel,
+export type GoogleFormTriggerToken = Realtime.Token<
+  typeof googleFormTriggerChannel,
   ["status"]
 >;
 
-export async function fetchManualTriggerRealtimeToken(): Promise<ManualTriggerToken> {
+export async function fetchGoogleFormTriggerRealtimeToken(): Promise<GoogleFormTriggerToken> {
   const token = await getSubscriptionToken(inngest, {
-    channel: manualTriggerChannel(),
+    channel: googleFormTriggerChannel(),
     topics: ["status"],
   });
 

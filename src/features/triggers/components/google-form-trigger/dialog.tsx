@@ -10,7 +10,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CopyIcon } from "lucide-react";
 import { useParams } from "next/navigation";
+import { useCallback } from "react";
 import { toast } from "sonner";
+import { generateGoogleFormScript } from "./utils";
 
 interface GoogleFormTriggerDialogProps {
   open: boolean;
@@ -28,14 +30,23 @@ export function GoogleFormTriggerDialog({
     process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3000";
   const webhookURL = `${baseURL}/api/webhooks/google-form?workflowId=${workflowId}`;
 
-  const copyToClipboard = async () => {
+  const copyToClipboard = useCallback(async () => {
     try {
       await navigator.clipboard.writeText(webhookURL);
       toast.success("Webhook URL copied to clipboard");
     } catch (error) {
       toast.error(`Failed to copy webhook URL: ${(error as Error).message}`);
     }
-  };
+  }, [webhookURL]);
+
+  const copyScriptToClipboard = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(generateGoogleFormScript(webhookURL));
+      toast.success("Script copied to clipboard");
+    } catch (error) {
+      toast.error(`Failed to copy Script: ${(error as Error).message}`);
+    }
+  }, [webhookURL]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -76,6 +87,44 @@ export function GoogleFormTriggerDialog({
               <li>Save and click {'"Triggers"'} &rarr; Add Trigger </li>
               <li>Choose: From form &rarr; On form submit &rarr; Save</li>
             </ol>
+          </div>
+          <div className="bg-muted space-y-3 rounded-lg p-4">
+            <h4 className="text-sm font-medium">Google Apps Script:</h4>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={copyScriptToClipboard}
+            >
+              <CopyIcon className="size-4" />
+              Copy Google Apps Script
+            </Button>
+            <p className="text-muted-foreground text-xs">
+              This script includes your webhook URL and handles form submissions
+            </p>
+          </div>
+
+          <div className="bg-muted space-y-3 rounded-lg p-4">
+            <h4 className="text-sm font-medium">Available Variables</h4>
+            <ul>
+              <li>
+                <code className="bg-background rounded px-1 py-0.5">
+                  {"{{googleForm.respondentEmail}}"}
+                </code>
+                - Respondent{"'"}s email
+              </li>
+              <li>
+                <code className="bg-background rounded px-1 py-0.5">
+                  {"{{googleForm.reponses['Question Name']}}"}
+                </code>
+                - Specific answer
+              </li>
+              <li>
+                <code className="bg-background rounded px-1 py-0.5">
+                  {"{{json GoogleForm.responses}}"}
+                </code>
+                - All responses as JSON
+              </li>
+            </ul>
           </div>
         </div>
       </DialogContent>
