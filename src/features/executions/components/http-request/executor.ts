@@ -3,7 +3,14 @@ import { httpRequestChannel } from "@/inngest/channels/http-request";
 import Handlebars from "handlebars";
 import { NonRetriableError } from "inngest";
 import ky, { type Options as KyOptions } from "ky";
-import { HttpRequestData, httpRequestDataSchema } from "./schema";
+import { httpRequestDataSchema } from "./schema";
+
+type HttpRequestData = {
+    variableName?: string;
+    endpoint?: string;
+    method?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
+    body?: string | undefined;
+}
 
 Handlebars.registerHelper("json", (context) => {
   const jsonString = JSON.stringify(context);

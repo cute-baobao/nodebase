@@ -1,8 +1,9 @@
 import { NodeType, NodeTypeValues } from "@/db";
-import { GoogleFormTriggerExecutor } from "@/features/triggers/components/google-form-trigger/executor";
+import { googleFormTriggerExecutor } from "@/features/triggers/components/google-form-trigger/executor";
 import { manualTriggerExecutor } from "@/features/triggers/components/manual-trigger/executor";
 import { httpRequestExecutor } from "../components/http-request/executor";
 import { NodeExecutor } from "../type";
+import { stripeTriggerExecutor } from "@/features/triggers/components/stripe-trigger/executor";
 
 export const executeRegistry: Record<NodeType, NodeExecutor> = {
   // INITIAL
@@ -12,7 +13,9 @@ export const executeRegistry: Record<NodeType, NodeExecutor> = {
   // HTTP_REQUEST
   [NodeTypeValues[2]]: httpRequestExecutor,
   // GOOGLE_FORM_TRIGGER
-  [NodeTypeValues[3]]: GoogleFormTriggerExecutor,
+  [NodeTypeValues[3]]: googleFormTriggerExecutor,
+  // STRIPE_TRIGGER
+  [NodeTypeValues[4]]: stripeTriggerExecutor, // Placeholder, replace with actual StripeTriggerExecutor when implemented
 };
 
 export const getExecutor = (type: NodeType): NodeExecutor => {
