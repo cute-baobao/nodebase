@@ -22,6 +22,9 @@ export const nodeType = pgEnum("node_type", [
   "HTTP_REQUEST",
   "GOOGLE_FORM_TRIGGER",
   "STRIPE_TRIGGER",
+  "OPENAI",
+  "GEMINI",
+  "DEEPSEEK"
 ]);
 
 export const NodeTypeValues = nodeType.enumValues;

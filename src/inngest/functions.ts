@@ -9,6 +9,7 @@ import {
 } from "./channels";
 import { inngest } from "./client";
 import { topologicalSort } from "./utils";
+import { geminiChannel } from "./channels/gemini";
 
 export const executeWorkflow = inngest.createFunction(
   { id: "execute-workflow" },
@@ -18,6 +19,7 @@ export const executeWorkflow = inngest.createFunction(
       httpRequestChannel(),
       manualTriggerChannel(),
       googleFormTriggerChannel(),
+      geminiChannel()
     ],
   },
   async ({ event, step, publish }) => {

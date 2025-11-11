@@ -33,17 +33,15 @@ const triggerNodeTypes: NodeTypeOption[] = [
   {
     type: NodeTypeValues[3],
     label: "Google Form",
-    description:
-      "Runs the workflow when a Google Form is submitted.",
+    description: "Runs the workflow when a Google Form is submitted.",
     icon: "/logos/google-form.svg",
   },
   {
     type: NodeTypeValues[4],
     label: "Stripe Event",
-    description:
-      "Runs the workflow when a Stripe event is captured.",
+    description: "Runs the workflow when a Stripe event is captured.",
     icon: "/logos/stripe.svg",
-  }
+  },
 ];
 
 const executionNodes: NodeTypeOption[] = [
@@ -52,6 +50,12 @@ const executionNodes: NodeTypeOption[] = [
     label: "HTTP Request",
     description: "Makes an HTTP request",
     icon: GlobeIcon,
+  },
+  {
+    type: NodeTypeValues[6],
+    label: "Gemini",
+    description: "Use Google Gemini to generate text",
+    icon: "/logos/gemini.svg",
   },
 ];
 

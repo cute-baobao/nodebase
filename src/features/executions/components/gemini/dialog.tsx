@@ -26,32 +26,33 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { GEMINI_AVAILABLE_MODELS } from "@/lib/configs/ai-constants";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useCallback, useEffect, useRef } from "react";
 import { useForm, useWatch } from "react-hook-form";
-import { HttpRequestData, httpRequestDataSchema } from "./schema";
+import { GeminiData, geminiDataSchema } from "./schema";
 
-interface HttpRequestDialogProps {
+interface GeminiDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (data: HttpRequestData) => void;
-  defaultValues: Partial<HttpRequestData>;
+  onSubmit: (data: GeminiData) => void;
+  defaultValues: Partial<GeminiData>;
 }
 
-export function HttpRequestDialog({
+export function GeminiDialog({
   open,
   onOpenChange,
   onSubmit,
   defaultValues = {},
-}: HttpRequestDialogProps) {
+}: GeminiDialogProps) {
   const submitButtonRef = useRef<HTMLButtonElement>(null);
-  const form = useForm<HttpRequestData>({
-    resolver: zodResolver(httpRequestDataSchema),
+  const form = useForm<GeminiData>({
+    resolver: zodResolver(geminiDataSchema),
     defaultValues: {
       variableName: defaultValues.variableName || "",
-      endpoint: defaultValues.endpoint || "",
-      method: defaultValues.method || "GET",
-      body: defaultValues.body || "",
+      model: defaultValues.model || GEMINI_AVAILABLE_MODELS[0],
+      systemPrompt: defaultValues.systemPrompt || "",
+      userPrompt: defaultValues.userPrompt || "",
     },
   });
 
@@ -60,11 +61,9 @@ export function HttpRequestDialog({
       control: form.control,
       name: "variableName",
     }) || "myApiCall";
-  const watchMethod = useWatch({ control: form.control, name: "method" });
-  const showBodyField = ["POST", "PUT", "PATCH"].includes(watchMethod);
 
   const handleSubmit = useCallback(
-    (data: HttpRequestData) => {
+    (data: GeminiData) => {
       onSubmit(data);
       onOpenChange(false);
     },
@@ -76,9 +75,9 @@ export function HttpRequestDialog({
     if (open) {
       form.reset({
         variableName: defaultValues.variableName || "",
-        endpoint: defaultValues.endpoint || "",
-        method: defaultValues.method || "GET",
-        body: defaultValues.body || "",
+        model: defaultValues.model || GEMINI_AVAILABLE_MODELS[0],
+        systemPrompt: defaultValues.systemPrompt || "",
+        userPrompt: defaultValues.userPrompt || "",
       });
     }
   }, [open, defaultValues, form]);
@@ -87,12 +86,12 @@ export function HttpRequestDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="pr-4">
         <DialogHeader>
-          <DialogTitle>Http Request</DialogTitle>
+          <DialogTitle>Gemini Configuration</DialogTitle>
           <DialogDescription>
-            Configure settings for the HTTP request node
+            Configure the AI model and prompts for this node.
           </DialogDescription>
         </DialogHeader>
-        <ScrollArea className="h-full w-full max-h-[60vh]">
+        <ScrollArea className="h-full max-h-[60vh]">
           <Form {...form}>
             <form
               className="mt-4 space-y-8 pr-4"
@@ -117,29 +116,29 @@ export function HttpRequestDialog({
               />
               <FormField
                 control={form.control}
-                name="method"
+                name="model"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Method</FormLabel>
+                    <FormLabel>Model</FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
                     >
                       <FormControl>
                         <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select a method" />
+                          <SelectValue placeholder="Select a model" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="GET">GET</SelectItem>
-                        <SelectItem value="POST">POST</SelectItem>
-                        <SelectItem value="PUT">PUT</SelectItem>
-                        <SelectItem value="DELETE">DELETE</SelectItem>
-                        <SelectItem value="PATCH">PATCH</SelectItem>
+                        {GEMINI_AVAILABLE_MODELS.map((model) => (
+                          <SelectItem key={model} value={model}>
+                            {model}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                     <FormDescription>
-                      The HTTP method to use for the request.
+                      The AI model to use for the request.
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -147,58 +146,56 @@ export function HttpRequestDialog({
               />
               <FormField
                 control={form.control}
-                name="endpoint"
+                name="systemPrompt"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Endpoint URL</FormLabel>
+                    <FormLabel>System Prompt (Optional)</FormLabel>
                     <FormControl>
-                      <Input
+                      <Textarea
                         {...field}
-                        placeholder="https://api.example.com/users/{{httpResponse.data.id}}"
+                        className="min-h-[80px] font-mono text-sm"
+                        placeholder={"You are a helpful assistant that..."}
                       />
                     </FormControl>
                     <FormDescription>
-                      Static URL or use {"{{variables}}"} for simple values or{" "}
-                      {"{{json variable}}"} to stringify objects
+                      Sets the behavior of the assistant. Use {"{{variables}}"}{" "}
+                      for simple values or {"{{json variable}}"} to stringify
+                      objects.
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              {showBodyField && (
-                <FormField
-                  control={form.control}
-                  name="body"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Body</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          {...field}
-                          className="min-h-[120px] font-mono text-sm"
-                          placeholder={
-                            '{\n "userId":"{{httpResponse.data.id}}",\n "name":"{{httpResponse.data.name}}",\n "items":{{httpResponse.data.items}}\n}'
-                          }
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        JSON with template variables. Use {"{{variables}}"} for
-                        simple values, or{"{{json variable}}"} to stringify
-                        objects
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )}
+              <FormField
+                control={form.control}
+                name="userPrompt"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>User Prompt</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        {...field}
+                        className="min-h-[120px] font-mono text-sm"
+                        placeholder={"Summarize the text: {{json httpResponse.data}}"}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      The prompt to send to the AI. Use {"{{variables}}"}{" "}
+                      for simple values or {"{{json variable}}"} to stringify
+                      objects.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <button
+                ref={submitButtonRef}
+                type="submit"
+                style={{ display: "none" }}
+                aria-hidden="true"
+              ></button>
             </form>
           </Form>
-          <button
-            ref={submitButtonRef}
-            type="submit"
-            style={{ display: "none" }}
-            aria-hidden="true"
-          ></button>
         </ScrollArea>
         <DialogFooter className="mt-4">
           <Button onClick={() => submitButtonRef.current?.click()}>Save</Button>
