@@ -153,7 +153,7 @@ export function NodeSelector({
                       alt={node.label}
                       width={20}
                       height={20}
-                      objectFit="contain"
+                      style={{ objectFit: "contain" }}
                       className="rounded-sm"
                     />
                   ) : (
@@ -187,7 +187,7 @@ export function NodeSelector({
                       alt={node.label}
                       width={20}
                       height={20}
-                      objectFit="contain"
+                      style={{ objectFit: "contain" }}
                       className="rounded-sm"
                     />
                   ) : (
