@@ -117,7 +117,7 @@ export function GoogleFormTriggerDialog({
                 </li>
                 <li>
                   <code className="bg-background rounded px-1 py-0.5">
-                    {"{{googleForm.reponses['Question Name']}}"}
+                    {"{{googleForm.responses['Question Name']}}"}
                   </code>
                   - Specific answer
                 </li>
