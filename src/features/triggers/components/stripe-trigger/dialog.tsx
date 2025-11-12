@@ -38,15 +38,6 @@ export function StripeTriggerDialog({
     }
   }, [webhookURL]);
 
-  const copyScriptToClipboard = useCallback(async () => {
-    try {
-      await navigator.clipboard.writeText("123");
-      toast.success("Script copied to clipboard");
-    } catch (error) {
-      toast.error(`Failed to copy Script: ${(error as Error).message}`);
-    }
-  }, []);
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
