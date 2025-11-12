@@ -1,2 +1,4 @@
-export * from "@/db/schemas/auth-schema";
-export * from "@/db/schemas/workflow-schema";
+export * from "./auth-schema";
+export * from "./workflow-schema";
+export * from "./credential-schema";
+export * from "./relations";
