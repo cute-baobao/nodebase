@@ -1,13 +1,13 @@
 import { NodeExecutor } from "@/features/executions/type";
-import { geminiChannel } from "@/inngest/channels";
-import { GEMINI_AVAILABLE_MODELS } from "@/lib/configs/ai-constants";
-import { createGoogleGenerativeAI } from "@ai-sdk/google";
+import { deepseekChannel } from "@/inngest/channels";
+import { DEEPSEEK_AVAILABLE_MODELS } from "@/lib/configs/ai-constants";
+import { createDeepSeek } from "@ai-sdk/deepseek";
 import { generateText } from "ai";
 import Handlebars from "handlebars";
 import { NonRetriableError } from "inngest";
-import { GeminiData, geminiDataSchema } from "./schema";
+import { DeepseekData, deepseekDataSchema } from "./schema";
 
-type GeminiNodeData = Partial<GeminiData>;
+type DeepseekNodeData = Partial<DeepseekData>;
 
 Handlebars.registerHelper("json", (context) => {
   const jsonString = JSON.stringify(context);
@@ -15,7 +15,7 @@ Handlebars.registerHelper("json", (context) => {
   return safeString;
 });
 
-export const geminiExecutor: NodeExecutor<GeminiNodeData> = async ({
+export const deepseekExecutor: NodeExecutor<DeepseekNodeData> = async ({
   data,
   nodeId,
   context,
@@ -23,22 +23,22 @@ export const geminiExecutor: NodeExecutor<GeminiNodeData> = async ({
   publish,
 }) => {
   await publish(
-    geminiChannel().status({
+    deepseekChannel().status({
       nodeId,
       status: "loading",
     }),
   );
 
-  const safeData = geminiDataSchema.safeParse(data);
+  const safeData = deepseekDataSchema.safeParse(data);
   if (!safeData.success) {
     await publish(
-      geminiChannel().status({
+      deepseekChannel().status({
         nodeId,
         status: "error",
       }),
     );
     throw new NonRetriableError(
-      `Invalid data for GEMINI node : ${safeData.error.issues.map((i) => i.message).join(", ")}`,
+      `Invalid data for Deepseek node : ${safeData.error.issues.map((i) => i.message).join(", ")}`,
     );
   }
 
@@ -47,22 +47,26 @@ export const geminiExecutor: NodeExecutor<GeminiNodeData> = async ({
     : "You are a helpful assistant.";
   const userPrompt = Handlebars.compile(safeData.data.userPrompt)(context);
   // TODO: Fetch credentials from user selected
-  const credentialValue = process.env.GOOGLE_GENERATIVE_AI_API_KEY!;
-  const google = createGoogleGenerativeAI({
+  const credentialValue = process.env.DEEPSEEK_API_KEY!;
+  const deepseek = createDeepSeek({
     apiKey: credentialValue,
   });
 
   try {
-    const { steps } = await step.ai.wrap("gemini-generate-text", generateText, {
-      model: google(safeData.data.model || GEMINI_AVAILABLE_MODELS[0]),
-      system: systemPrompt,
-      prompt: userPrompt,
-    });
+    const { steps } = await step.ai.wrap(
+      "deepseek-generate-text",
+      generateText,
+      {
+        model: deepseek(safeData.data.model || DEEPSEEK_AVAILABLE_MODELS[0]),
+        system: systemPrompt,
+        prompt: userPrompt,
+      },
+    );
 
     const text =
       steps[0].content[0].type === "text" ? steps[0].content[0].text : "";
     await publish(
-      geminiChannel().status({
+      deepseekChannel().status({
         nodeId,
         status: "success",
       }),
@@ -78,7 +82,7 @@ export const geminiExecutor: NodeExecutor<GeminiNodeData> = async ({
     };
   } catch (error) {
     await publish(
-      geminiChannel().status({
+      deepseekChannel().status({
         nodeId,
         status: "error",
       }),

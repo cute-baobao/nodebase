@@ -52,10 +52,22 @@ const executionNodes: NodeTypeOption[] = [
     icon: GlobeIcon,
   },
   {
+    type: NodeTypeValues[5],
+    label: "OpenAI",
+    description: "Use OpenAI to generate text",
+    icon: "/logos/openai.svg",
+  },
+  {
     type: NodeTypeValues[6],
     label: "Gemini",
     description: "Use Google Gemini to generate text",
     icon: "/logos/gemini.svg",
+  },
+  {
+    type: NodeTypeValues[7],
+    label: "Deepseek",
+    description: "Use Deepseek to generate text",
+    icon: "/logos/deepseek.svg",
   },
 ];
 

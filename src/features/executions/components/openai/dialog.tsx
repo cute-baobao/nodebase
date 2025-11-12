@@ -26,31 +26,31 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { GEMINI_AVAILABLE_MODELS } from "@/lib/configs/ai-constants";
+import { OPENAI_AVAILABLE_MODELS } from "@/lib/configs/ai-constants";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useCallback, useEffect, useRef } from "react";
 import { useForm, useWatch } from "react-hook-form";
-import { GeminiData, geminiDataSchema } from "./schema";
+import { OpenaiData, openaiDataSchema } from "./schema";
 
-interface GeminiDialogProps {
+interface OpenaiDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (data: GeminiData) => void;
-  defaultValues: Partial<GeminiData>;
+  onSubmit: (data: OpenaiData) => void;
+  defaultValues: Partial<OpenaiData>;
 }
 
-export function GeminiDialog({
+export function OpenaiDialog({
   open,
   onOpenChange,
   onSubmit,
   defaultValues = {},
-}: GeminiDialogProps) {
+}: OpenaiDialogProps) {
   const submitButtonRef = useRef<HTMLButtonElement>(null);
-  const form = useForm<GeminiData>({
-    resolver: zodResolver(geminiDataSchema),
+  const form = useForm<OpenaiData>({
+    resolver: zodResolver(openaiDataSchema),
     defaultValues: {
       variableName: defaultValues.variableName || "",
-      model: defaultValues.model || GEMINI_AVAILABLE_MODELS[0],
+      model: defaultValues.model || OPENAI_AVAILABLE_MODELS[0],
       systemPrompt: defaultValues.systemPrompt || "",
       userPrompt: defaultValues.userPrompt || "",
     },
@@ -60,10 +60,10 @@ export function GeminiDialog({
     useWatch({
       control: form.control,
       name: "variableName",
-    }) || "myGemini";
+    }) || "myOpenai";
 
   const handleSubmit = useCallback(
-    (data: GeminiData) => {
+    (data: OpenaiData) => {
       onSubmit(data);
       onOpenChange(false);
     },
@@ -75,7 +75,7 @@ export function GeminiDialog({
     if (open) {
       form.reset({
         variableName: defaultValues.variableName || "",
-        model: defaultValues.model || GEMINI_AVAILABLE_MODELS[0],
+        model: defaultValues.model || OPENAI_AVAILABLE_MODELS[0],
         systemPrompt: defaultValues.systemPrompt || "",
         userPrompt: defaultValues.userPrompt || "",
       });
@@ -86,7 +86,7 @@ export function GeminiDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="pr-4">
         <DialogHeader>
-          <DialogTitle>Gemini Configuration</DialogTitle>
+          <DialogTitle>Openai Configuration</DialogTitle>
           <DialogDescription>
             Configure the AI model and prompts for this node.
           </DialogDescription>
@@ -104,7 +104,7 @@ export function GeminiDialog({
                   <FormItem>
                     <FormLabel>Variable Name</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="myGemini" />
+                      <Input {...field} placeholder="myOpenai" />
                     </FormControl>
                     <FormDescription>
                       Use this name to reference the result in other node:{" "}
@@ -130,7 +130,7 @@ export function GeminiDialog({
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {GEMINI_AVAILABLE_MODELS.map((model) => (
+                        {OPENAI_AVAILABLE_MODELS.map((model) => (
                           <SelectItem key={model} value={model}>
                             {model}
                           </SelectItem>
@@ -176,12 +176,14 @@ export function GeminiDialog({
                       <Textarea
                         {...field}
                         className="min-h-[120px] font-mono text-sm"
-                        placeholder={"Summarize the text: {{json httpResponse.data}}"}
+                        placeholder={
+                          "Summarize the text: {{json httpResponse.data}}"
+                        }
                       />
                     </FormControl>
                     <FormDescription>
-                      The prompt to send to the AI. Use {"{{variables}}"}{" "}
-                      for simple values or {"{{json variable}}"} to stringify
+                      The prompt to send to the AI. Use {"{{variables}}"} for
+                      simple values or {"{{json variable}}"} to stringify
                       objects.
                     </FormDescription>
                     <FormMessage />

@@ -3,13 +3,15 @@ import { getExecutor } from "@/features/executions/lib/executor-registry";
 import { WorkflowDb } from "@/features/workflows/server/routers";
 import { NonRetriableError } from "inngest";
 import {
+  deepseekChannel,
   googleFormTriggerChannel,
   httpRequestChannel,
   manualTriggerChannel,
 } from "./channels";
+import { geminiChannel } from "./channels/gemini";
 import { inngest } from "./client";
 import { topologicalSort } from "./utils";
-import { geminiChannel } from "./channels/gemini";
+import { openaiChannel } from "./channels/openai";
 
 export const executeWorkflow = inngest.createFunction(
   { id: "execute-workflow" },
@@ -19,7 +21,9 @@ export const executeWorkflow = inngest.createFunction(
       httpRequestChannel(),
       manualTriggerChannel(),
       googleFormTriggerChannel(),
-      geminiChannel()
+      geminiChannel(),
+      deepseekChannel(),
+      openaiChannel()
     ],
   },
   async ({ event, step, publish }) => {

@@ -1,13 +1,13 @@
 import { NodeExecutor } from "@/features/executions/type";
-import { geminiChannel } from "@/inngest/channels";
-import { GEMINI_AVAILABLE_MODELS } from "@/lib/configs/ai-constants";
-import { createGoogleGenerativeAI } from "@ai-sdk/google";
+import { openaiChannel } from "@/inngest/channels";
+import { OPENAI_AVAILABLE_MODELS } from "@/lib/configs/ai-constants";
+import { createOpenAI } from "@ai-sdk/openai";
 import { generateText } from "ai";
 import Handlebars from "handlebars";
 import { NonRetriableError } from "inngest";
-import { GeminiData, geminiDataSchema } from "./schema";
+import { OpenaiData, openaiDataSchema } from "./schema";
 
-type GeminiNodeData = Partial<GeminiData>;
+type OpenaiNodeData = Partial<OpenaiData>;
 
 Handlebars.registerHelper("json", (context) => {
   const jsonString = JSON.stringify(context);
@@ -15,7 +15,7 @@ Handlebars.registerHelper("json", (context) => {
   return safeString;
 });
 
-export const geminiExecutor: NodeExecutor<GeminiNodeData> = async ({
+export const openaiExecutor: NodeExecutor<OpenaiNodeData> = async ({
   data,
   nodeId,
   context,
@@ -23,22 +23,22 @@ export const geminiExecutor: NodeExecutor<GeminiNodeData> = async ({
   publish,
 }) => {
   await publish(
-    geminiChannel().status({
+    openaiChannel().status({
       nodeId,
       status: "loading",
     }),
   );
 
-  const safeData = geminiDataSchema.safeParse(data);
+  const safeData = openaiDataSchema.safeParse(data);
   if (!safeData.success) {
     await publish(
-      geminiChannel().status({
+      openaiChannel().status({
         nodeId,
         status: "error",
       }),
     );
     throw new NonRetriableError(
-      `Invalid data for GEMINI node : ${safeData.error.issues.map((i) => i.message).join(", ")}`,
+      `Invalid data for Openai node : ${safeData.error.issues.map((i) => i.message).join(", ")}`,
     );
   }
 
@@ -47,14 +47,14 @@ export const geminiExecutor: NodeExecutor<GeminiNodeData> = async ({
     : "You are a helpful assistant.";
   const userPrompt = Handlebars.compile(safeData.data.userPrompt)(context);
   // TODO: Fetch credentials from user selected
-  const credentialValue = process.env.GOOGLE_GENERATIVE_AI_API_KEY!;
-  const google = createGoogleGenerativeAI({
+  const credentialValue = process.env.OPENAI_API_KEY!;
+  const openai = createOpenAI({
     apiKey: credentialValue,
   });
 
   try {
-    const { steps } = await step.ai.wrap("gemini-generate-text", generateText, {
-      model: google(safeData.data.model || GEMINI_AVAILABLE_MODELS[0]),
+    const { steps } = await step.ai.wrap("openai-generate-text", generateText, {
+      model: openai(safeData.data.model || OPENAI_AVAILABLE_MODELS[0] || ""),
       system: systemPrompt,
       prompt: userPrompt,
     });
@@ -62,7 +62,7 @@ export const geminiExecutor: NodeExecutor<GeminiNodeData> = async ({
     const text =
       steps[0].content[0].type === "text" ? steps[0].content[0].text : "";
     await publish(
-      geminiChannel().status({
+      openaiChannel().status({
         nodeId,
         status: "success",
       }),
@@ -78,7 +78,7 @@ export const geminiExecutor: NodeExecutor<GeminiNodeData> = async ({
     };
   } catch (error) {
     await publish(
-      geminiChannel().status({
+      openaiChannel().status({
         nodeId,
         status: "error",
       }),

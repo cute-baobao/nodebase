@@ -1,10 +1,12 @@
 import { NodeType, NodeTypeValues } from "@/db";
 import { googleFormTriggerExecutor } from "@/features/triggers/components/google-form-trigger/executor";
 import { manualTriggerExecutor } from "@/features/triggers/components/manual-trigger/executor";
-import { httpRequestExecutor } from "../components/http-request/executor";
-import { NodeExecutor } from "../type";
 import { stripeTriggerExecutor } from "@/features/triggers/components/stripe-trigger/executor";
+import { deepseekExecutor } from "../components/deepseek/executor";
 import { geminiExecutor } from "../components/gemini/executor";
+import { httpRequestExecutor } from "../components/http-request/executor";
+import { openaiExecutor } from "../components/openai/executor";
+import { NodeExecutor } from "../type";
 
 export const executeRegistry: Record<NodeType, NodeExecutor> = {
   // INITIAL
@@ -18,11 +20,11 @@ export const executeRegistry: Record<NodeType, NodeExecutor> = {
   // STRIPE_TRIGGER
   [NodeTypeValues[4]]: stripeTriggerExecutor,
   // OPENAI
-  [NodeTypeValues[5]]: httpRequestExecutor, // TODO - implement openai executor
+  [NodeTypeValues[5]]: openaiExecutor,
   // GEMINI
   [NodeTypeValues[6]]: geminiExecutor,
   // DEEPSEEK
-  [NodeTypeValues[7]]: httpRequestExecutor, // TODO - implement deepseek executor
+  [NodeTypeValues[7]]: deepseekExecutor,
 };
 
 export const getExecutor = (type: NodeType): NodeExecutor => {
