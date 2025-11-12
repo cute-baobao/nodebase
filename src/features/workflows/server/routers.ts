@@ -1,6 +1,8 @@
 import db, { connection, node, NodeType, NodeTypeValues, workflow } from "@/db";
+import { inngest } from "@/inngest/client";
+import { sendWorkflowExecution } from "@/inngest/utils";
 import { PAGINATION } from "@/lib/configs/constants";
-import { edgeSchema, nodeSchema } from "@/lib/shared/workflow";
+import { edgeSchema, nodeSchema } from "@/lib/shared/schemas/workflow";
 import {
   createTRPCRouter,
   premiumProcedure,
@@ -12,6 +14,21 @@ import { and, desc, eq, ilike } from "drizzle-orm";
 import z from "zod";
 
 export const workflowsRouter = createTRPCRouter({
+  execute: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const { id } = input;
+      const workflow = await WorkflowDb.getOne({
+        workflowId: id,
+        userId: ctx.auth.user.id,
+      });
+
+      await sendWorkflowExecution({
+        workflowId: workflow.id,
+      });
+
+      return workflow;
+    }),
   create: premiumProcedure.mutation(async ({ ctx }) => {
     return await db.transaction(async (tx) => {
       const [workflowData] = await tx
@@ -194,7 +211,7 @@ export const workflowsRouter = createTRPCRouter({
 });
 
 // 提取出常用的数据库操作
-class WorkflowDb {
+export class WorkflowDb {
   static async getOne({
     workflowId,
     userId,
@@ -204,6 +221,23 @@ class WorkflowDb {
   }) {
     const data = await db.query.workflow.findFirst({
       where: and(eq(workflow.id, workflowId), eq(workflow.userId, userId)),
+      with: {
+        nodes: true,
+        connections: true,
+      },
+    });
+    if (data === undefined) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: `Workflow with id ${workflowId} not found`,
+      });
+    }
+    return data;
+  }
+
+  static async getOneWithoutUser({ workflowId }: { workflowId: string }) {
+    const data = await db.query.workflow.findFirst({
+      where: eq(workflow.id, workflowId),
       with: {
         nodes: true,
         connections: true,

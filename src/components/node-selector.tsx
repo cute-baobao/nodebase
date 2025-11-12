@@ -1,6 +1,7 @@
 import { NodeType, NodeTypeValues } from "@/db";
 import { useReactFlow } from "@xyflow/react";
 import { GlobeIcon, MousePointerIcon } from "lucide-react";
+import Image from "next/image";
 import React, { useCallback } from "react";
 import { toast } from "sonner";
 import { v4 as createID } from "uuid";
@@ -29,6 +30,18 @@ const triggerNodeTypes: NodeTypeOption[] = [
       "Runs the workflow on clicking a button. Good for getting started quickly.",
     icon: MousePointerIcon,
   },
+  {
+    type: NodeTypeValues[3],
+    label: "Google Form",
+    description: "Runs the workflow when a Google Form is submitted.",
+    icon: "/logos/google-form.svg",
+  },
+  {
+    type: NodeTypeValues[4],
+    label: "Stripe Event",
+    description: "Runs the workflow when a Stripe event is captured.",
+    icon: "/logos/stripe.svg",
+  },
 ];
 
 const executionNodes: NodeTypeOption[] = [
@@ -37,6 +50,24 @@ const executionNodes: NodeTypeOption[] = [
     label: "HTTP Request",
     description: "Makes an HTTP request",
     icon: GlobeIcon,
+  },
+  {
+    type: NodeTypeValues[5],
+    label: "OpenAI",
+    description: "Use OpenAI to generate text",
+    icon: "/logos/openai.svg",
+  },
+  {
+    type: NodeTypeValues[6],
+    label: "Gemini",
+    description: "Use Google Gemini to generate text",
+    icon: "/logos/gemini.svg",
+  },
+  {
+    type: NodeTypeValues[7],
+    label: "Deepseek",
+    description: "Use Deepseek to generate text",
+    icon: "/logos/deepseek.svg",
   },
 ];
 
@@ -117,9 +148,13 @@ export function NodeSelector({
               >
                 <div className="flex w-full items-center gap-6 overflow-hidden">
                   {typeof Icon === "string" ? (
-                    <img
+                    <Image
                       src={Icon}
-                      className="size-5 rounded-sm object-contain"
+                      alt={node.label}
+                      width={20}
+                      height={20}
+                      objectFit="contain"
+                      className="rounded-sm"
                     />
                   ) : (
                     <Icon className="size-5 rounded-sm object-contain" />
@@ -147,9 +182,13 @@ export function NodeSelector({
               >
                 <div className="flex w-full items-center gap-6 overflow-hidden">
                   {typeof Icon === "string" ? (
-                    <img
+                    <Image
                       src={Icon}
-                      className="size-5 rounded-sm object-contain"
+                      alt={node.label}
+                      width={20}
+                      height={20}
+                      objectFit="contain"
+                      className="rounded-sm"
                     />
                   ) : (
                     <Icon className="size-5 rounded-sm object-contain" />

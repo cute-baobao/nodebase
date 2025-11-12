@@ -16,7 +16,16 @@ export type Workflow = InferSelectModel<typeof workflow>;
 // === workflow ===
 
 // === node type ===
-export const nodeType = pgEnum("node_type", ["INITIAL","MANUAL_TRIGGER","HTTP_REQUEST"]);
+export const nodeType = pgEnum("node_type", [
+  "INITIAL",
+  "MANUAL_TRIGGER",
+  "HTTP_REQUEST",
+  "GOOGLE_FORM_TRIGGER",
+  "STRIPE_TRIGGER",
+  "OPENAI",
+  "GEMINI",
+  "DEEPSEEK"
+]);
 
 export const NodeTypeValues = nodeType.enumValues;
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { ErrorView, LoadingView } from "@/components/entity-components";
+import { NodeTypeValues } from "@/db";
 import { useSuspenseSingleWorkflow } from "@/features/workflows/hooks/use-workflows";
 import { nodeComponents } from "@/lib/configs/node-components";
 import {
@@ -20,9 +21,11 @@ import {
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { useSetAtom } from "jotai";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { editorAtom } from "../store/atoms";
 import { AddNodeButton } from "./add-node-button";
+import { ExecuteWorkflowButton } from "./execute-workflow-button";
+import { FormatLayoutButton } from "./format-layout-button";
 
 export function EditorLoading() {
   return <LoadingView message="Loading editor..." />;
@@ -34,11 +37,13 @@ export function EditorError() {
 
 export function Editor({ workflowId }: { workflowId: string }) {
   const { data: workflow } = useSuspenseSingleWorkflow(workflowId);
-
   const setEditor = useSetAtom(editorAtom);
-
   const [nodes, setNodes] = useState<Node[]>(workflow.nodes);
   const [edges, setEdges] = useState<Edge[]>(workflow.edges);
+
+  const hasManualTrigger = useMemo(() => {
+    return nodes.some((node) => node.type === NodeTypeValues[1]);
+  }, [nodes]);
 
   const onNodesChange = useCallback(
     (changes: NodeChange[]) =>
@@ -73,9 +78,15 @@ export function Editor({ workflowId }: { workflowId: string }) {
         <Background />
         <Controls />
         <MiniMap />
-        <Panel position="top-right">
+        <Panel className="flex flex-col gap-2" position="top-right">
           <AddNodeButton />
+          <FormatLayoutButton />
         </Panel>
+        {hasManualTrigger && (
+          <Panel position="bottom-center">
+            <ExecuteWorkflowButton workflowId={workflowId} />
+          </Panel>
+        )}
       </ReactFlow>
     </div>
   );
