@@ -69,6 +69,12 @@ const executionNodes: NodeTypeOption[] = [
     description: "Use Deepseek to generate text",
     icon: "/logos/deepseek.svg",
   },
+  {
+    type: NodeTypeValues[8],
+    label: "Discord",
+    description: "Use Discord to send messages",
+    icon: "/logos/discord.svg",
+  },
 ];
 
 interface NodeSelectorProps {

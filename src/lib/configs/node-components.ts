@@ -1,6 +1,7 @@
 import { InitialNode } from "@/components/initial-node";
 import { NodeTypeValues } from "@/db";
 import { DeepseekNode } from "@/features/executions/components/deepseek/node";
+import { DiscordNode } from "@/features/executions/components/discord/node";
 import { GeminiNode } from "@/features/executions/components/gemini/node";
 import { HttpRequestNode } from "@/features/executions/components/http-request/node";
 import { OpenaiNode } from "@/features/executions/components/openai/node";
@@ -18,6 +19,7 @@ export const nodeComponents = {
   [NodeTypeValues[5]]: OpenaiNode,
   [NodeTypeValues[6]]: GeminiNode,
   [NodeTypeValues[7]]: DeepseekNode,
+  [NodeTypeValues[8]]: DiscordNode,
 } as const satisfies NodeTypes;
 
 export type RegisteredNodeType = keyof typeof nodeComponents;

@@ -5,3 +5,4 @@ export * from "./stripe-trigger";
 export * from "./gemini";
 export * from "./deepseek";
 export * from "./openai";
+export * from "./discord";

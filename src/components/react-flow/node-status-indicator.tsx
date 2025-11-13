@@ -3,7 +3,7 @@ import { type ReactNode } from "react";
 
 import { cn } from "@/lib/utils/index";
 
-export type NodeStatus = "loading" | "success" | "error" | "initial";
+export type NodeStatus = "loading" | "success" | "error" | "initial" | "retry";
 
 export type NodeStatusVariant = "overlay" | "border";
 

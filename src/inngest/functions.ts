@@ -13,6 +13,7 @@ import { geminiChannel } from "./channels/gemini";
 import { openaiChannel } from "./channels/openai";
 import { inngest } from "./client";
 import { topologicalSort } from "./utils";
+import { discordChannel } from "./channels/discord";
 
 export const executeWorkflow = inngest.createFunction(
   { id: "execute-workflow" },
@@ -25,6 +26,7 @@ export const executeWorkflow = inngest.createFunction(
       geminiChannel(),
       deepseekChannel(),
       openaiChannel(),
+      discordChannel(),
     ],
   },
   async ({ event, step, publish }) => {

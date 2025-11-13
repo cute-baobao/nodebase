@@ -25,7 +25,8 @@ export const nodeType = pgEnum("node_type", [
   "STRIPE_TRIGGER",
   "OPENAI",
   "GEMINI",
-  "DEEPSEEK"
+  "DEEPSEEK",
+  "DISCORD"
 ]);
 
 export const NodeTypeValues = nodeType.enumValues;

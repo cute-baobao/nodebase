@@ -64,6 +64,13 @@
       "when": 1762959117549,
       "tag": "0008_add-credential",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1763043150722,
+      "tag": "0009_add-discord-node",
+      "breakpoints": true
     }
   ]
 }

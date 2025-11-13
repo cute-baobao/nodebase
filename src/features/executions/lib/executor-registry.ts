@@ -3,6 +3,7 @@ import { googleFormTriggerExecutor } from "@/features/triggers/components/google
 import { manualTriggerExecutor } from "@/features/triggers/components/manual-trigger/executor";
 import { stripeTriggerExecutor } from "@/features/triggers/components/stripe-trigger/executor";
 import { deepseekExecutor } from "../components/deepseek/executor";
+import { discordExecutor } from "../components/discord/executor";
 import { geminiExecutor } from "../components/gemini/executor";
 import { httpRequestExecutor } from "../components/http-request/executor";
 import { openaiExecutor } from "../components/openai/executor";
@@ -25,6 +26,8 @@ export const executeRegistry: Record<NodeType, NodeExecutor> = {
   [NodeTypeValues[6]]: geminiExecutor,
   // DEEPSEEK
   [NodeTypeValues[7]]: deepseekExecutor,
+  // DISCORD
+  [NodeTypeValues[8]]: discordExecutor,
 };
 
 export const getExecutor = (type: NodeType): NodeExecutor => {
