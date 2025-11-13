@@ -5,6 +5,10 @@ import { InferSelectModel } from "drizzle-orm";
 
 export const credentialType = pgEnum("credential_type", ["OPENAI", "GEMINI", "DEEPSEEK"])
 
+export const CredentialTypeValues = credentialType.enumValues;
+
+export type CredentialType = typeof CredentialTypeValues[number];
+
 export const credential = pgTable("credential", {
     id: uuid().defaultRandom().primaryKey(),
     name: text().notNull(),

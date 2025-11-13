@@ -1,4 +1,4 @@
-import db, { credential, credentialType } from "@/db";
+import db, { credential, credentialType, CredentialTypeValues } from "@/db";
 import { PAGINATION } from "@/lib/configs/constants";
 import {
   createTRPCRouter,
@@ -124,7 +124,7 @@ export const credentialsRouter = createTRPCRouter({
       };
     }),
   getByType: protectedProcedure
-    .input(z.object({ type: z.enum(credentialType.enumValues) }))
+    .input(z.object({ type: z.enum(CredentialTypeValues) }))
     .query(({ ctx, input }) => {
       const items = db.query.credential.findMany({
         where: and(

@@ -30,7 +30,7 @@ export const nodeType = pgEnum("node_type", [
 
 export const NodeTypeValues = nodeType.enumValues;
 
-export type NodeType = (typeof nodeType.enumValues)[number];
+export type NodeType = (typeof NodeTypeValues)[number];
 // === node type ===
 
 // === node ===
