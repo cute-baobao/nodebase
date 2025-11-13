@@ -1,8 +1,10 @@
+import db from "@/db";
 import { NodeExecutor } from "@/features/executions/type";
 import { openaiChannel } from "@/inngest/channels";
 import { OPENAI_AVAILABLE_MODELS } from "@/lib/configs/ai-constants";
 import { createOpenAI } from "@ai-sdk/openai";
 import { generateText } from "ai";
+import { and, eq } from "drizzle-orm";
 import Handlebars from "handlebars";
 import { NonRetriableError } from "inngest";
 import { OpenaiData, openaiDataSchema } from "./schema";
@@ -20,6 +22,7 @@ export const openaiExecutor: NodeExecutor<OpenaiNodeData> = async ({
   nodeId,
   context,
   step,
+  userId,
   publish,
 }) => {
   await publish(
@@ -46,8 +49,24 @@ export const openaiExecutor: NodeExecutor<OpenaiNodeData> = async ({
     ? Handlebars.compile(safeData.data.systemPrompt)(context)
     : "You are a helpful assistant.";
   const userPrompt = Handlebars.compile(safeData.data.userPrompt)(context);
-  // TODO: Fetch credentials from user selected
-  const credentialValue = process.env.OPENAI_API_KEY!;
+  const credential = await step.run("get-openai-credential", () => {
+    return db.query.credential.findFirst({
+      where: (c) =>
+        and(eq(c.id, safeData.data.credentialId), eq(c.userId, userId)),
+    });
+  });
+
+  if (!credential) {
+    await publish(
+      openaiChannel().status({
+        nodeId,
+        status: "error",
+      }),
+    );
+    throw new NonRetriableError("Openai credential not found");
+  }
+
+  const credentialValue = credential.value;
   const openai = createOpenAI({
     apiKey: credentialValue,
   });

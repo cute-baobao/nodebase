@@ -3,6 +3,7 @@ import { Node } from "@xyflow/react";
 import { z } from "zod";
 
 export const deepseekDataSchema = z.object({
+  credentialId: z.string().min(1, { message: "Credential ID is required" }),
   variableName: z
     .string()
     .min(1, { message: "Variable name is required" })

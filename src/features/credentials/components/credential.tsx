@@ -12,7 +12,6 @@ import {
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -27,6 +26,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { CredentialType, CredentialTypeValues } from "@/db";
+import { credentialTypeOptions } from "@/lib/configs/credential-constants";
 import { useUpgradeModal } from "@/lib/hooks/use-upgrade-modal";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
@@ -37,9 +37,9 @@ import { useForm } from "react-hook-form";
 import z from "zod";
 import {
   useCreateCredential,
+  useSuspenseSingleCredential,
   useUpdatedCredential,
 } from "../hooks/use-credentials";
-import { credentialTypeOptions } from "@/lib/configs/credential-constants";
 
 interface CredentialProps {
   initialData?: {
@@ -57,8 +57,6 @@ const credentialSchema = z.object({
 });
 
 type CredentialFormData = z.infer<typeof credentialSchema>;
-
-
 
 export function CredentialForm({ initialData }: CredentialProps) {
   const submitButtonRef = useRef<HTMLButtonElement>(null);
@@ -161,9 +159,7 @@ export function CredentialForm({ initialData }: CredentialProps) {
                         ))}
                       </SelectContent>
                     </Select>
-                    <FormDescription>
-                      The HTTP method to use for the request.
-                    </FormDescription>
+
                     <FormMessage />
                   </FormItem>
                 )}
@@ -210,4 +206,10 @@ export function CredentialForm({ initialData }: CredentialProps) {
       </Card>
     </>
   );
+}
+
+export function CredentialView({ credentialId }: { credentialId: string }) {
+  const { data: credential } = useSuspenseSingleCredential(credentialId);
+
+  return <CredentialForm initialData={credential} />;
 }

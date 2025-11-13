@@ -1,8 +1,10 @@
+import db from "@/db";
 import { NodeExecutor } from "@/features/executions/type";
 import { geminiChannel } from "@/inngest/channels";
 import { GEMINI_AVAILABLE_MODELS } from "@/lib/configs/ai-constants";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { generateText } from "ai";
+import { and, eq } from "drizzle-orm";
 import Handlebars from "handlebars";
 import { NonRetriableError } from "inngest";
 import { GeminiData, geminiDataSchema } from "./schema";
@@ -18,6 +20,7 @@ Handlebars.registerHelper("json", (context) => {
 export const geminiExecutor: NodeExecutor<GeminiNodeData> = async ({
   data,
   nodeId,
+  userId,
   context,
   step,
   publish,
@@ -46,8 +49,24 @@ export const geminiExecutor: NodeExecutor<GeminiNodeData> = async ({
     ? Handlebars.compile(safeData.data.systemPrompt)(context)
     : "You are a helpful assistant.";
   const userPrompt = Handlebars.compile(safeData.data.userPrompt)(context);
-  // TODO: Fetch credentials from user selected
-  const credentialValue = process.env.GOOGLE_GENERATIVE_AI_API_KEY!;
+  const credential = await step.run("get-gemini-credential", () => {
+    return db.query.credential.findFirst({
+      where: (c) =>
+        and(eq(c.id, safeData.data.credentialId), eq(c.userId, userId)),
+    });
+  });
+
+  if (!credential) {
+    await publish(
+      geminiChannel().status({
+        nodeId,
+        status: "error",
+      }),
+    );
+    throw new NonRetriableError("GEMINI credential not found");
+  }
+
+  const credentialValue = credential.value;
   const google = createGoogleGenerativeAI({
     apiKey: credentialValue,
   });

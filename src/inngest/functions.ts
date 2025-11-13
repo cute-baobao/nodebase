@@ -1,6 +1,7 @@
-import { NodeType } from "@/db";
+import db, { NodeType } from "@/db";
 import { getExecutor } from "@/features/executions/lib/executor-registry";
 import { WorkflowDb } from "@/features/workflows/server/routers";
+import { eq } from "drizzle-orm";
 import { NonRetriableError } from "inngest";
 import {
   deepseekChannel,
@@ -9,9 +10,9 @@ import {
   manualTriggerChannel,
 } from "./channels";
 import { geminiChannel } from "./channels/gemini";
+import { openaiChannel } from "./channels/openai";
 import { inngest } from "./client";
 import { topologicalSort } from "./utils";
-import { openaiChannel } from "./channels/openai";
 
 export const executeWorkflow = inngest.createFunction(
   { id: "execute-workflow" },
@@ -23,7 +24,7 @@ export const executeWorkflow = inngest.createFunction(
       googleFormTriggerChannel(),
       geminiChannel(),
       deepseekChannel(),
-      openaiChannel()
+      openaiChannel(),
     ],
   },
   async ({ event, step, publish }) => {
@@ -40,6 +41,18 @@ export const executeWorkflow = inngest.createFunction(
       return topologicalSort(flow.nodes, flow.connections);
     });
 
+    const userId = await step.run("get-user-id", () => {
+      return db.query.workflow.findFirst({
+        where: (wf) => eq(wf.id, workflowId),
+        columns: {
+          userId: true,
+        },
+      });
+    });
+
+    if (!userId) {
+      throw new NonRetriableError("No user found for workflow");
+    }
     // Initialize the context with any initial data from the trigger
     let context = event.data.initialData || {};
 
@@ -48,6 +61,7 @@ export const executeWorkflow = inngest.createFunction(
       context = await executor({
         data: node.data as Record<string, unknown>,
         nodeId: node.id,
+        userId: userId.userId,
         context,
         step,
         publish,

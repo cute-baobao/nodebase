@@ -7,6 +7,6 @@ export function prefetchCredentials(params: Input) {
   return prefetch(trpc.credentials.getMany.queryOptions(params));
 }
 
-export function prefetchSingleCredentials(id: string) {
+export function prefetchSingleCredential(id: string) {
   return prefetch(trpc.credentials.getOne.queryOptions({ id }));
 }
