@@ -8,6 +8,7 @@ import { and, eq } from "drizzle-orm";
 import Handlebars from "handlebars";
 import { NonRetriableError } from "inngest";
 import { OpenaiData, openaiDataSchema } from "./schema";
+import { decrypt } from "@/lib/utils/encryption";
 
 type OpenaiNodeData = Partial<OpenaiData>;
 
@@ -66,7 +67,7 @@ export const openaiExecutor: NodeExecutor<OpenaiNodeData> = async ({
     throw new NonRetriableError("Openai credential not found");
   }
 
-  const credentialValue = credential.value;
+  const credentialValue = decrypt(credential.value);
   const openai = createOpenAI({
     apiKey: credentialValue,
   });

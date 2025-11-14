@@ -8,6 +8,7 @@ import { and, eq } from "drizzle-orm";
 import Handlebars from "handlebars";
 import { NonRetriableError } from "inngest";
 import { GeminiData, geminiDataSchema } from "./schema";
+import { decrypt } from "@/lib/utils/encryption";
 
 type GeminiNodeData = Partial<GeminiData>;
 
@@ -66,7 +67,7 @@ export const geminiExecutor: NodeExecutor<GeminiNodeData> = async ({
     throw new NonRetriableError("GEMINI credential not found");
   }
 
-  const credentialValue = credential.value;
+  const credentialValue = decrypt(credential.value);
   const google = createGoogleGenerativeAI({
     apiKey: credentialValue,
   });

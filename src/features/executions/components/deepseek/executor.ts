@@ -2,6 +2,7 @@ import db from "@/db";
 import { NodeExecutor } from "@/features/executions/type";
 import { deepseekChannel } from "@/inngest/channels";
 import { DEEPSEEK_AVAILABLE_MODELS } from "@/lib/configs/ai-constants";
+import { decrypt } from "@/lib/utils/encryption";
 import { createDeepSeek } from "@ai-sdk/deepseek";
 import { generateText } from "ai";
 import { and, eq } from "drizzle-orm";
@@ -66,7 +67,7 @@ export const deepseekExecutor: NodeExecutor<DeepseekNodeData> = async ({
     throw new NonRetriableError("Deepseek credential not found");
   }
 
-  const credentialValue = credential.value;
+  const credentialValue = decrypt(credential.value);
   const deepseek = createDeepSeek({
     apiKey: credentialValue,
   });
