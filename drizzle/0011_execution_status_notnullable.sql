@@ -1,0 +1,1 @@
+ALTER TABLE "execution" ALTER COLUMN "status" SET NOT NULL;

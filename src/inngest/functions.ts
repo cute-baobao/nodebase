@@ -1,7 +1,7 @@
-import db, { NodeType } from "@/db";
+import db, { execution, NodeType } from "@/db";
 import { getExecutor } from "@/features/executions/lib/executor-registry";
 import { WorkflowDb } from "@/features/workflows/server/routers";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { NonRetriableError } from "inngest";
 import {
   deepseekChannel,
@@ -9,14 +9,28 @@ import {
   httpRequestChannel,
   manualTriggerChannel,
 } from "./channels";
+import { discordChannel } from "./channels/discord";
 import { geminiChannel } from "./channels/gemini";
 import { openaiChannel } from "./channels/openai";
 import { inngest } from "./client";
 import { topologicalSort } from "./utils";
-import { discordChannel } from "./channels/discord";
 
 export const executeWorkflow = inngest.createFunction(
-  { id: "execute-workflow" },
+  {
+    id: "execute-workflow",
+    onFailure: async ({ event, step }) => {
+      return await step.run("mark-execution-failed", async () => {
+        return db
+          .update(execution)
+          .set({
+            status: "FAILED",
+            error: event.data.error.message,
+            errorStack: event.data.error.stack,
+          })
+          .where(and(eq(execution.inngestEventId, event.data.event.id!)));
+      });
+    },
+  },
   {
     event: "workflows/execute.workflow",
     channels: [
@@ -30,13 +44,24 @@ export const executeWorkflow = inngest.createFunction(
     ],
   },
   async ({ event, step, publish }) => {
+    const inngestEventId = event.id;
     const workflowId = event.data.workflowId;
 
-    if (!workflowId) {
-      throw new NonRetriableError("No workflow ID provided");
+    if (!workflowId || !inngestEventId) {
+      throw new NonRetriableError(
+        "No workflow ID or Inngest event ID provided",
+      );
     }
 
-    await step.sleep("test", "5s");
+    await step.run("create-execution-record", async () => {
+      return db
+        .insert(execution)
+        .values({
+          workflowId,
+          inngestEventId,
+        })
+        .returning();
+    });
 
     const sortedNodes = await step.run("prepare-workflow", async () => {
       const flow = await WorkflowDb.getOneWithoutUser({ workflowId });
@@ -69,6 +94,18 @@ export const executeWorkflow = inngest.createFunction(
         publish,
       });
     }
+
+    await step.run("finalize-execution", async () => {
+      return db
+        .update(execution)
+        .set({ completedAt: new Date(), status: "SUCCESS" })
+        .where(
+          and(
+            eq(execution.workflowId, workflowId),
+            eq(execution.inngestEventId, inngestEventId),
+          ),
+        );
+    });
 
     return { workflowId, result: context };
   },

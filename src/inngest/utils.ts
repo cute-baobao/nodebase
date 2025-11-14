@@ -1,5 +1,6 @@
 import { Connection, Node } from "@/db";
 import toposort from "toposort";
+import { v4 as createID } from "uuid";
 import { inngest } from "./client";
 
 export const topologicalSort = (
@@ -50,5 +51,6 @@ export const sendWorkflowExecution = async (data: {
   return inngest.send({
     name: "workflows/execute.workflow",
     data,
+    id: createID(),
   });
 };
