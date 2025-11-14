@@ -98,7 +98,7 @@ export const executeWorkflow = inngest.createFunction(
     await step.run("finalize-execution", async () => {
       return db
         .update(execution)
-        .set({ completedAt: new Date(), status: "SUCCESS" })
+        .set({ completedAt: new Date(), status: "SUCCESS", output: context })
         .where(
           and(
             eq(execution.workflowId, workflowId),

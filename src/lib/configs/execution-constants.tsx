@@ -6,7 +6,7 @@ import {
   XCircleIcon,
 } from "lucide-react";
 
-export const title = (status: ExecutionStatus) => {
+export const formatStatus = (status: ExecutionStatus) => {
   return status.charAt(0) + status.slice(1).toLowerCase();
 };
 

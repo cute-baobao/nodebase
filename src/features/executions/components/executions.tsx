@@ -12,7 +12,7 @@ import {
   LoadingView,
 } from "@/components/entity-components";
 import { Execution } from "@/db";
-import { calculateDuration, getStatusIcon, title } from "@/lib/configs/execution-constants";
+import { calculateDuration, getStatusIcon, formatStatus } from "@/lib/configs/execution-constants";
 import { useEntitySearch } from "@/lib/hooks/use-entity-search";
 import { formatDistanceToNow } from "date-fns";
 import { useSuspenseExecutions } from "../hooks/use-executions";
@@ -116,7 +116,7 @@ export function ExecutionItem({
   return (
     <EntityItem
       href={`/executions/${data.id}`}
-      title={title(data.status)}
+      title={formatStatus(data.status)}
       subtitle={
         <>
           {data.name} &bull; Started{" "}

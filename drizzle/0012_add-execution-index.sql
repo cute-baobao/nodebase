@@ -1,0 +1,1 @@
+CREATE INDEX "execution_workflowId_startedAt" ON "execution" USING btree ("workflowId","started_at");
