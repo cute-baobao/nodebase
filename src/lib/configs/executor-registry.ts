@@ -1,13 +1,13 @@
 import { NodeType, NodeTypeValues } from "@/db";
+import { deepseekExecutor } from "@/features/execution-node/components/deepseek/executor";
+import { discordExecutor } from "@/features/execution-node/components/discord/executor";
+import { geminiExecutor } from "@/features/execution-node/components/gemini/executor";
+import { httpRequestExecutor } from "@/features/execution-node/components/http-request/executor";
+import { openaiExecutor } from "@/features/execution-node/components/openai/executor";
+import { NodeExecutor } from "@/features/executions/type";
 import { googleFormTriggerExecutor } from "@/features/triggers/components/google-form-trigger/executor";
 import { manualTriggerExecutor } from "@/features/triggers/components/manual-trigger/executor";
 import { stripeTriggerExecutor } from "@/features/triggers/components/stripe-trigger/executor";
-import { deepseekExecutor } from "../components/deepseek/executor";
-import { discordExecutor } from "../components/discord/executor";
-import { geminiExecutor } from "../components/gemini/executor";
-import { httpRequestExecutor } from "../components/http-request/executor";
-import { openaiExecutor } from "../components/openai/executor";
-import { NodeExecutor } from "../type";
 
 export const executeRegistry: Record<NodeType, NodeExecutor> = {
   // INITIAL

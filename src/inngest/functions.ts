@@ -1,6 +1,6 @@
 import { execution, NodeType } from "@/db";
 import db from "@/db/instance";
-import { getExecutor } from "@/features/executions/lib/executor-registry";
+import { getExecutor } from "@/lib/configs/executor-registry";
 import { WorkflowDb } from "@/features/workflows/server/routers";
 import { and, eq } from "drizzle-orm";
 import { NonRetriableError } from "inngest";
