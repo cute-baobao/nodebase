@@ -1,8 +1,11 @@
+import db from "@/db";
 import { NodeExecutor } from "@/features/executions/type";
 import { deepseekChannel } from "@/inngest/channels";
 import { DEEPSEEK_AVAILABLE_MODELS } from "@/lib/configs/ai-constants";
+import { decrypt } from "@/lib/utils/encryption";
 import { createDeepSeek } from "@ai-sdk/deepseek";
 import { generateText } from "ai";
+import { and, eq } from "drizzle-orm";
 import Handlebars from "handlebars";
 import { NonRetriableError } from "inngest";
 import { DeepseekData, deepseekDataSchema } from "./schema";
@@ -20,6 +23,7 @@ export const deepseekExecutor: NodeExecutor<DeepseekNodeData> = async ({
   nodeId,
   context,
   step,
+  userId,
   publish,
 }) => {
   await publish(
@@ -46,8 +50,24 @@ export const deepseekExecutor: NodeExecutor<DeepseekNodeData> = async ({
     ? Handlebars.compile(safeData.data.systemPrompt)(context)
     : "You are a helpful assistant.";
   const userPrompt = Handlebars.compile(safeData.data.userPrompt)(context);
-  // TODO: Fetch credentials from user selected
-  const credentialValue = process.env.DEEPSEEK_API_KEY!;
+  const credential = await step.run("get-deepseek-credential", () => {
+    return db.query.credential.findFirst({
+      where: (c) =>
+        and(eq(c.id, safeData.data.credentialId), eq(c.userId, userId)),
+    });
+  });
+
+  if (!credential) {
+    await publish(
+      deepseekChannel().status({
+        nodeId,
+        status: "error",
+      }),
+    );
+    throw new NonRetriableError("Deepseek credential not found");
+  }
+
+  const credentialValue = decrypt(credential.value);
   const deepseek = createDeepSeek({
     apiKey: credentialValue,
   });

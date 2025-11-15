@@ -1,7 +1,8 @@
-import { InferSelectModel, relations } from "drizzle-orm";
+import { InferSelectModel } from "drizzle-orm";
 import { json, pgEnum, pgTable, text, unique, uuid } from "drizzle-orm/pg-core";
 import { user } from "./auth-schema";
 import { timestamps } from "./fields";
+import { credential } from "./credential-schema";
 
 // === workflow ===
 export const workflow = pgTable("workflow", {
@@ -24,12 +25,13 @@ export const nodeType = pgEnum("node_type", [
   "STRIPE_TRIGGER",
   "OPENAI",
   "GEMINI",
-  "DEEPSEEK"
+  "DEEPSEEK",
+  "DISCORD"
 ]);
 
 export const NodeTypeValues = nodeType.enumValues;
 
-export type NodeType = (typeof nodeType.enumValues)[number];
+export type NodeType = (typeof NodeTypeValues)[number];
 // === node type ===
 
 // === node ===
@@ -42,6 +44,7 @@ export const node = pgTable("node", {
   type: nodeType().notNull(),
   position: json(),
   data: json().default("{}"),
+  credentialId: uuid("credential_id").references(() => credential.id, { onDelete: "set null" }),
   ...timestamps,
 });
 
@@ -72,23 +75,3 @@ export const connection = pgTable(
 export type Connection = InferSelectModel<typeof connection>;
 // === connection ===
 
-// relations
-export const workflowRelations = relations(workflow, ({ many }) => ({
-  nodes: many(node),
-  connections: many(connection),
-}));
-
-export const nodeRelations = relations(node, ({ one }) => ({
-  workflow: one(workflow, {
-    fields: [node.workflowId],
-    references: [workflow.id],
-  }),
-}));
-
-export const connectionRelations = relations(connection, ({ one }) => ({
-  workflow: one(workflow, {
-    fields: [connection.workflowId],
-    references: [workflow.id],
-  }),
-}));
-// relations

@@ -92,7 +92,7 @@ export function HttpRequestDialog({
             Configure settings for the HTTP request node
           </DialogDescription>
         </DialogHeader>
-        <ScrollArea className="h-full w-full max-h-[60vh]">
+        <ScrollArea className="h-full max-h-[60vh] w-full">
           <Form {...form}>
             <form
               className="mt-4 space-y-8 pr-4"
@@ -191,14 +191,14 @@ export function HttpRequestDialog({
                   )}
                 />
               )}
+              <button
+                ref={submitButtonRef}
+                type="submit"
+                style={{ display: "none" }}
+                aria-hidden="true"
+              ></button>
             </form>
           </Form>
-          <button
-            ref={submitButtonRef}
-            type="submit"
-            style={{ display: "none" }}
-            aria-hidden="true"
-          ></button>
         </ScrollArea>
         <DialogFooter className="mt-4">
           <Button onClick={() => submitButtonRef.current?.click()}>Save</Button>

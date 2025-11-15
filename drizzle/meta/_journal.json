@@ -57,6 +57,41 @@
       "when": 1762867034535,
       "tag": "0007_add_ai_node",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1762959117549,
+      "tag": "0008_add-credential",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1763043150722,
+      "tag": "0009_add-discord-node",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1763104357470,
+      "tag": "0010_add_execution_schema",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1763109667572,
+      "tag": "0011_execution_status_notnullable",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1763131132252,
+      "tag": "0012_add-execution-index",
+      "breakpoints": true
     }
   ]
 }

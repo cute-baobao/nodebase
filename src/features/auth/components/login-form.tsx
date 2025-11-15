@@ -18,7 +18,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { signIn } from "@/lib/auth-client";
+import { authClient, signIn } from "@/lib/auth-client";
 import { loginFormSchema, LoginFormSchema } from "@/lib/shared/schemas/auth";
 import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -66,6 +66,25 @@ export default function LoginForm() {
         },
       },
     });
+  };
+
+  const signInGithub = async () => {
+    await authClient.signIn.social(
+      {
+        provider: "github",
+      },
+      {
+        onSuccess: () => {
+          router.push("/");
+        },
+        onError: (error) => {
+          toast.error(
+            " Github OAuth error: " +
+              (error instanceof Error ? error.message : String(error)),
+          );
+        },
+      },
+    );
   };
 
   // use isSubmitting for request-in-flight state, and isValid to enable submit
@@ -155,22 +174,7 @@ export default function LoginForm() {
                   variant="outline"
                   className={cn("w-full gap-2")}
                   disabled={loading}
-                  onClick={async () => {
-                    await signIn.social(
-                      {
-                        provider: "github",
-                        callbackURL: "/",
-                      },
-                      {
-                        onRequest: (ctx) => {
-                          setLoading(true);
-                        },
-                        onResponse: (ctx) => {
-                          setLoading(false);
-                        },
-                      },
-                    );
-                  }}
+                  onClick={signInGithub}
                 >
                   <Image
                     src="/logos/github.svg"

@@ -84,7 +84,7 @@ export function GoogleFormTriggerDialog({
               <ol className="text-muted-foreground list-inside list-decimal space-y-1 text-sm">
                 <li>Open your Google Form</li>
                 <li>Click the three dots menu &rarr; Script editor</li>
-                <li>Copy adn paste the script below</li>
+                <li>Copy and paste the script below</li>
                 <li>Replace WEBHOOK_URL with your webhook URL above</li>
                 <li>Save and click {'"Triggers"'} &rarr; Add Trigger </li>
                 <li>Choose: From form &rarr; On form submit &rarr; Save</li>
@@ -117,7 +117,7 @@ export function GoogleFormTriggerDialog({
                 </li>
                 <li>
                   <code className="bg-background rounded px-1 py-0.5">
-                    {"{{googleForm.reponses['Question Name']}}"}
+                    {"{{googleForm.responses['Question Name']}}"}
                   </code>
                   - Specific answer
                 </li>
