@@ -1,4 +1,4 @@
-import { useNodeStatus } from "@/features/executions/hooks/use-node-status";
+import { useNodeStatus } from "@/features/execution-node/hooks/use-node-status";
 import { STRIPE_TRIGGER_CHANNEL_NAME } from "@/inngest/channels";
 import { NodeProps } from "@xyflow/react";
 import { memo, useCallback, useState } from "react";

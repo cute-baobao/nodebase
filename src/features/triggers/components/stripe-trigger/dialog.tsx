@@ -1,3 +1,4 @@
+"uce client";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -8,6 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { env } from "@/env";
 import { CopyIcon } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useCallback } from "react";
@@ -25,8 +27,7 @@ export function StripeTriggerDialog({
   const params = useParams();
   const workflowId = params.workflowId as string;
 
-  const baseURL =
-    process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3000";
+  const baseURL = env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3000";
   const webhookURL = `${baseURL}/api/webhooks/stripe?workflowId=${workflowId}`;
 
   const copyToClipboard = useCallback(async () => {

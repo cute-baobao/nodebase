@@ -1,4 +1,5 @@
-import db, { connection, node, NodeType, NodeTypeValues, workflow } from "@/db";
+import { connection, node, NodeType, NodeTypeValues, workflow } from "@/db";
+import db from "@/db/instance";
 import { sendWorkflowExecution } from "@/inngest/utils";
 import { PAGINATION } from "@/lib/configs/constants";
 import { edgeSchema, nodeSchema } from "@/lib/shared/schemas/workflow";

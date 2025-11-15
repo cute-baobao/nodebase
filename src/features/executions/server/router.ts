@@ -1,4 +1,5 @@
-import db, { execution, workflow } from "@/db";
+import { execution, workflow } from "@/db";
+import db from "@/db/instance";
 import { PAGINATION } from "@/lib/configs/constants";
 import { createTRPCRouter, protectedProcedure } from "@/trpc/init";
 import { TRPCError } from "@trpc/server";

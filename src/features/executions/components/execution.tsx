@@ -73,7 +73,7 @@ export const ExecutionView = ({ executionId }: { executionId: string }) => {
           {execution.completedAt ? (
             <div>
               <p className="text-muted-foreground text-sm font-medium">
-                Compeleted
+                Completed
               </p>
               <p className="text-sm">
                 {formatDistanceToNow(execution.completedAt, {

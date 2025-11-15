@@ -1,5 +1,6 @@
-import db, { execution, NodeType } from "@/db";
-import { getExecutor } from "@/features/executions/lib/executor-registry";
+import { execution, NodeType } from "@/db";
+import db from "@/db/instance";
+import { getExecutor } from "@/lib/configs/executor-registry";
 import { WorkflowDb } from "@/features/workflows/server/routers";
 import { and, eq } from "drizzle-orm";
 import { NonRetriableError } from "inngest";
@@ -77,7 +78,7 @@ export const executeWorkflow = inngest.createFunction(
       });
     });
 
-    if (!userId) {
+    if (!userId?.userId) {
       throw new NonRetriableError("No user found for workflow");
     }
     // Initialize the context with any initial data from the trigger

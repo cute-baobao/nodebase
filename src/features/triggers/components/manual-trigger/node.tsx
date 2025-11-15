@@ -1,4 +1,4 @@
-import { useNodeStatus } from "@/features/executions/hooks/use-node-status";
+import { useNodeStatus } from "@/features/execution-node/hooks/use-node-status";
 import { MANUAL_TRIGGER_CHANNEL_NAME } from "@/inngest/channels/manual-trigger";
 import { NodeProps } from "@xyflow/react";
 import { MousePointerIcon } from "lucide-react";

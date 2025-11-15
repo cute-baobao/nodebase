@@ -1,4 +1,4 @@
-import db from "@/db";
+import db from "@/db/instance";
 import { NodeExecutor } from "@/features/executions/type";
 import { deepseekChannel } from "@/inngest/channels";
 import { DEEPSEEK_AVAILABLE_MODELS } from "@/lib/configs/ai-constants";
@@ -8,6 +8,7 @@ import { generateText } from "ai";
 import { and, eq } from "drizzle-orm";
 import Handlebars from "handlebars";
 import { NonRetriableError } from "inngest";
+import { checkNodeCanExecute } from "../../utils/check-node-can-execute";
 import { DeepseekData, deepseekDataSchema } from "./schema";
 
 type DeepseekNodeData = Partial<DeepseekData>;
@@ -26,53 +27,55 @@ export const deepseekExecutor: NodeExecutor<DeepseekNodeData> = async ({
   userId,
   publish,
 }) => {
-  await publish(
-    deepseekChannel().status({
-      nodeId,
-      status: "loading",
-    }),
-  );
-
-  const safeData = deepseekDataSchema.safeParse(data);
-  if (!safeData.success) {
-    await publish(
-      deepseekChannel().status({
-        nodeId,
-        status: "error",
-      }),
-    );
-    throw new NonRetriableError(
-      `Invalid data for Deepseek node : ${safeData.error.issues.map((i) => i.message).join(", ")}`,
-    );
-  }
-
-  const systemPrompt = safeData.data.systemPrompt
-    ? Handlebars.compile(safeData.data.systemPrompt)(context)
-    : "You are a helpful assistant.";
-  const userPrompt = Handlebars.compile(safeData.data.userPrompt)(context);
-  const credential = await step.run("get-deepseek-credential", () => {
-    return db.query.credential.findFirst({
-      where: (c) =>
-        and(eq(c.id, safeData.data.credentialId), eq(c.userId, userId)),
-    });
-  });
-
-  if (!credential) {
-    await publish(
-      deepseekChannel().status({
-        nodeId,
-        status: "error",
-      }),
-    );
-    throw new NonRetriableError("Deepseek credential not found");
-  }
-
-  const credentialValue = decrypt(credential.value);
-  const deepseek = createDeepSeek({
-    apiKey: credentialValue,
-  });
-
   try {
+    await publish(
+      deepseekChannel().status({
+        nodeId,
+        status: "loading",
+      }),
+    );
+
+    await checkNodeCanExecute(nodeId);
+
+    const safeData = deepseekDataSchema.safeParse(data);
+    if (!safeData.success) {
+      await publish(
+        deepseekChannel().status({
+          nodeId,
+          status: "error",
+        }),
+      );
+      throw new NonRetriableError(
+        `Invalid data for Deepseek node : ${safeData.error.issues.map((i) => i.message).join(", ")}`,
+      );
+    }
+
+    const systemPrompt = safeData.data.systemPrompt
+      ? Handlebars.compile(safeData.data.systemPrompt)(context)
+      : "You are a helpful assistant.";
+    const userPrompt = Handlebars.compile(safeData.data.userPrompt)(context);
+    const credential = await step.run("get-deepseek-credential", () => {
+      return db.query.credential.findFirst({
+        where: (c) =>
+          and(eq(c.id, safeData.data.credentialId), eq(c.userId, userId)),
+      });
+    });
+
+    if (!credential) {
+      await publish(
+        deepseekChannel().status({
+          nodeId,
+          status: "error",
+        }),
+      );
+      throw new NonRetriableError("Deepseek credential not found");
+    }
+
+    const credentialValue = decrypt(credential.value);
+    const deepseek = createDeepSeek({
+      apiKey: credentialValue,
+    });
+
     const { steps } = await step.ai.wrap(
       "deepseek-generate-text",
       generateText,
@@ -101,6 +104,7 @@ export const deepseekExecutor: NodeExecutor<DeepseekNodeData> = async ({
       },
     };
   } catch (error) {
+    console.error("Deepseek executor error:", error);
     await publish(
       deepseekChannel().status({
         nodeId,

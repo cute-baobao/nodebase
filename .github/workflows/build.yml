@@ -1,0 +1,183 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, dev]
+    tags:
+      - "*"
+  pull_request:
+    branches: [main, dev]
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Enable pnpm via Corepack
+        run: |
+          corepack enable
+          corepack prepare pnpm@latest --activate
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run linter
+        run: pnpm run lint
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: lint
+    if: github.event_name == 'push' || github.event_name == 'pull_request'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Create .env.local for build
+        run: |
+          cat > .env.local << 'EOF'
+          # DatabaseURL
+          DATABASE_URL="postgresql://user:password@localhost:5432/nodebase"
+          
+          # BETTER_AUTH
+          BETTER_AUTH_SECRET="random_secret_key_for_build_123456789"
+          BETTER_AUTH_URL="http://localhost:3000"
+          
+          # GITHUB_OAUTH
+          GITHUB_CLIENT_ID="test_github_client_id_12345"
+          GITHUB_CLIENT_SECRET="test_github_client_secret_67890"
+          
+          # GOOGLE API KEY
+          GOOGLE_GENERATIVE_AI_API_KEY="test_google_api_key_abc123"
+          
+          DEEPSEEK_API_KEY="test_deepseek_api_key_def456"
+          
+          OPENAI_API_KEY="test_openai_api_key_ghi789"
+          
+          SENTRY_AUTH_TOKEN="test_sentry_token_jkl012"
+          
+          POLAR_ACCESS_TOKEN="test_polar_token_mno345"
+          POLAR_SUCCESS_URL="http://localhost:3000/success"
+          
+          NGROK_URL="http://localhost:4040"
+          
+          ENCRYPTION_KEY="test_encryption_key_pqr678test_encryption_key_pqr678"
+          
+          NEXT_PUBLIC_API_BASE_URL="http://localhost:3000/api"
+          EOF
+
+      - name: Build
+        run: pnpm run build
+
+  publish-docker:
+    name: Publish Docker image
+    runs-on: ubuntu-latest
+    needs: [lint, build]
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Create .env.local for Docker build
+        run: |
+          cat > .env.local << 'EOF'
+          # DatabaseURL
+          DATABASE_URL="postgresql://user:password@localhost:5432/nodebase"
+          
+          # BETTER_AUTH
+          BETTER_AUTH_SECRET="random_secret_key_for_build_123456789"
+          BETTER_AUTH_URL="http://localhost:3000"
+          
+          # GITHUB_OAUTH
+          GITHUB_CLIENT_ID="test_github_client_id_12345"
+          GITHUB_CLIENT_SECRET="test_github_client_secret_67890"
+          
+          # GOOGLE API KEY
+          GOOGLE_GENERATIVE_AI_API_KEY="test_google_api_key_abc123"
+          
+          DEEPSEEK_API_KEY="test_deepseek_api_key_def456"
+          
+          OPENAI_API_KEY="test_openai_api_key_ghi789"
+          
+          SENTRY_AUTH_TOKEN="test_sentry_token_jkl012"
+          
+          POLAR_ACCESS_TOKEN="test_polar_token_mno345"
+          POLAR_SUCCESS_URL="http://localhost:3000/success"
+          
+          NGROK_URL="http://localhost:4040"
+          
+          ENCRYPTION_KEY="test_encryption_key_pqr678test_encryption_key_pqr678"
+          
+          NEXT_PUBLIC_API_BASE_URL="http://localhost:3000/api"
+          EOF
+
+      - name: Print tag info
+        run: |
+          echo "GITHUB_REF: ${GITHUB_REF}"
+          echo "GITHUB_REF_NAME: ${GITHUB_REF_NAME}"
+
+      - name: Ensure tag commit is on main
+        run: |
+          TAG=${GITHUB_REF#refs/tags/}
+          echo "Tag: $TAG"
+          git fetch origin main
+          if git merge-base --is-ancestor ${GITHUB_SHA} origin/main; then
+            echo "Tag commit ${GITHUB_SHA} is on origin/main — continuing"
+          else
+            echo "Tag commit ${GITHUB_SHA} is not on origin/main — skipping build"
+            exit 1
+          fi
+
+      - name: Compute image tag (strip leading v)
+        run: |
+          TAG=${GITHUB_REF#refs/tags/}
+          IMAGE_TAG=${TAG#v}
+          echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
+          echo "Computed IMAGE_TAG=$IMAGE_TAG"
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.BUILD_TOKEN }}
+
+      - name: Build and push image (multi-arch)
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: ghcr.io/cute-baobao/nodebase-nextjs:${{ env.IMAGE_TAG }}

@@ -1,10 +1,10 @@
 import { InitialNode } from "@/components/initial-node";
 import { NodeTypeValues } from "@/db";
-import { DeepseekNode } from "@/features/executions/components/deepseek/node";
-import { DiscordNode } from "@/features/executions/components/discord/node";
-import { GeminiNode } from "@/features/executions/components/gemini/node";
-import { HttpRequestNode } from "@/features/executions/components/http-request/node";
-import { OpenaiNode } from "@/features/executions/components/openai/node";
+import { DeepseekNode } from "@/features/execution-node/components/deepseek/node";
+import { DiscordNode } from "@/features/execution-node/components/discord/node";
+import { GeminiNode } from "@/features/execution-node/components/gemini/node";
+import { HttpRequestNode } from "@/features/execution-node/components/http-request/node";
+import { OpenaiNode } from "@/features/execution-node/components/openai/node";
 import { GoogleFormTrigger } from "@/features/triggers/components/google-form-trigger/node";
 import { ManualTriggerNode } from "@/features/triggers/components/manual-trigger/node";
 import { StripeTrigger } from "@/features/triggers/components/stripe-trigger/node";

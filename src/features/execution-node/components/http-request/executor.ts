@@ -3,14 +3,15 @@ import { httpRequestChannel } from "@/inngest/channels/http-request";
 import Handlebars from "handlebars";
 import { NonRetriableError } from "inngest";
 import ky, { type Options as KyOptions } from "ky";
+import { checkNodeCanExecute } from "../../utils/check-node-can-execute";
 import { httpRequestDataSchema } from "./schema";
 
 type HttpRequestData = {
-    variableName?: string;
-    endpoint?: string;
-    method?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
-    body?: string | undefined;
-}
+  variableName?: string;
+  endpoint?: string;
+  method?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
+  body?: string | undefined;
+};
 
 Handlebars.registerHelper("json", (context) => {
   const jsonString = JSON.stringify(context);
@@ -25,28 +26,29 @@ export const httpRequestExecutor: NodeExecutor<HttpRequestData> = async ({
   step,
   publish,
 }) => {
-  await publish(
-    httpRequestChannel().status({
-      nodeId,
-      status: "loading",
-    }),
-  );
-
-  const safeData = httpRequestDataSchema.safeParse(data);
-  if (!safeData.success) {
-    // Publish error state for HTTP request node
+  try {
     await publish(
       httpRequestChannel().status({
         nodeId,
-        status: "error",
+        status: "loading",
       }),
     );
-    throw new NonRetriableError(
-      `Invalid data for HTTP Request node : ${safeData.error.issues.map((i) => i.message).join(", ")}`,
-    );
-  }
 
-  try {
+    await checkNodeCanExecute(nodeId);
+
+    const safeData = httpRequestDataSchema.safeParse(data);
+    if (!safeData.success) {
+      // Publish error state for HTTP request node
+      await publish(
+        httpRequestChannel().status({
+          nodeId,
+          status: "error",
+        }),
+      );
+      throw new NonRetriableError(
+        `Invalid data for HTTP Request node : ${safeData.error.issues.map((i) => i.message).join(", ")}`,
+      );
+    }
     const result = await step.run("http-request", async () => {
       const method = safeData.data.method;
       const endpoint = Handlebars.compile(safeData.data.endpoint)(context);
