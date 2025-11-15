@@ -1,4 +1,5 @@
-import db, { credential, credentialType, CredentialTypeValues } from "@/db";
+import { credential, credentialType, CredentialTypeValues } from "@/db";
+import db from "@/db/instance";
 import { PAGINATION } from "@/lib/configs/constants";
 import { encrypt } from "@/lib/utils/encryption";
 import {

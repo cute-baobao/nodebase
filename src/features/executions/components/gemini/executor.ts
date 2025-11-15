@@ -1,4 +1,4 @@
-import db from "@/db";
+import db from "@/db/instance";
 import { NodeExecutor } from "@/features/executions/type";
 import { geminiChannel } from "@/inngest/channels";
 import { GEMINI_AVAILABLE_MODELS } from "@/lib/configs/ai-constants";

@@ -1,4 +1,5 @@
-import { db } from "@/db";
+import db from "@/db/instance";
+import { env } from "@/env";
 import { checkout, polar, portal } from "@polar-sh/better-auth";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
@@ -24,7 +25,7 @@ export const auth = betterAuth({
               slug: "pro",
             },
           ],
-          successUrl: process.env.POLAR_SUCCESS_URL!,
+          successUrl: env.POLAR_SUCCESS_URL,
         }),
         portal(),
       ],
@@ -32,8 +33,8 @@ export const auth = betterAuth({
   ],
   socialProviders: {
     github: {
-      clientId: process.env.GITHUB_CLIENT_ID as string,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
+      clientId: env.GITHUB_CLIENT_ID,
+      clientSecret: env.GITHUB_CLIENT_SECRET,
     },
   },
 });

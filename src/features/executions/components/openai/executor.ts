@@ -1,4 +1,4 @@
-import db from "@/db";
+import db from "@/db/instance";
 import { NodeExecutor } from "@/features/executions/type";
 import { openaiChannel } from "@/inngest/channels";
 import { OPENAI_AVAILABLE_MODELS } from "@/lib/configs/ai-constants";

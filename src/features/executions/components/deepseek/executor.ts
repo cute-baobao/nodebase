@@ -1,4 +1,4 @@
-import db from "@/db";
+import db from "@/db/instance";
 import { NodeExecutor } from "@/features/executions/type";
 import { deepseekChannel } from "@/inngest/channels";
 import { DEEPSEEK_AVAILABLE_MODELS } from "@/lib/configs/ai-constants";
