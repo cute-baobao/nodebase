@@ -17,10 +17,8 @@ export async function checkNodeCanExecute(nodeId: string) {
 
   // check if the node has any incoming connections
   const nodeConnections = await db.query.connection.findFirst({
-    where: (connection, { eq, and }) => eq(connection.toNodeId, nodeId),
+    where: (connection, { eq }) => eq(connection.toNodeId, nodeId),
   });
-
-  console.log
 
   if (!nodeConnections) {
     throw new NonRetriableError(
