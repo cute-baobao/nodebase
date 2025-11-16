@@ -17,7 +17,10 @@ export const useSuspenseCredentials = () => {
   const trpc = useTRPC();
   const [params] = useCredentialsParams();
 
-  return useSuspenseQuery(trpc.credentials.getMany.queryOptions(params));
+  return useSuspenseQuery({
+    ...trpc.credentials.getMany.queryOptions(params),
+    staleTime: 0,
+  });
 };
 
 /**
@@ -27,7 +30,10 @@ export const useSuspenseCredentials = () => {
  */
 export const useSuspenseSingleCredential = (id: string) => {
   const trpc = useTRPC();
-  return useSuspenseQuery(trpc.credentials.getOne.queryOptions({ id }));
+  return useSuspenseQuery({
+    ...trpc.credentials.getOne.queryOptions({ id }),
+    staleTime: 0,
+  });
 };
 
 /**
