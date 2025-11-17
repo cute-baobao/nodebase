@@ -1,7 +1,7 @@
 import { execution, NodeType } from "@/db";
 import db from "@/db/instance";
-import { getExecutor } from "@/lib/configs/executor-registry";
 import { WorkflowDb } from "@/features/workflows/server/routers";
+import { getExecutor } from "@/lib/configs/executor-registry";
 import { and, eq } from "drizzle-orm";
 import { NonRetriableError } from "inngest";
 import {
@@ -54,8 +54,8 @@ export const executeWorkflow = inngest.createFunction(
       );
     }
 
-    await step.run("create-execution-record", async () => {
-      return db
+    const [e] = await step.run("create-execution-record", async () => {
+      return await db
         .insert(execution)
         .values({
           workflowId,
@@ -90,6 +90,7 @@ export const executeWorkflow = inngest.createFunction(
         data: node.data as Record<string, unknown>,
         nodeId: node.id,
         userId: userId.userId,
+        executionId: e.id,
         context,
         step,
         publish,

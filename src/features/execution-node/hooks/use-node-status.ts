@@ -1,4 +1,4 @@
-import { NodeStatus } from "@/components/react-flow/node-status-indicator";
+import { NodeStatus } from "@/lib/configs/workflow-constants";
 import { Realtime } from "@inngest/realtime";
 import { useInngestSubscription } from "@inngest/realtime/hooks";
 import { useEffect, useState } from "react";

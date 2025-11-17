@@ -1,5 +1,7 @@
 import { NodeExecutor } from "@/features/executions/type";
 import { httpRequestChannel } from "@/inngest/channels/http-request";
+import { updateNodeStatus } from "@/inngest/utils";
+import { NodeStatus } from "@/lib/configs/workflow-constants";
 import Handlebars from "handlebars";
 import { NonRetriableError } from "inngest";
 import ky, { type Options as KyOptions } from "ky";
@@ -25,26 +27,28 @@ export const httpRequestExecutor: NodeExecutor<HttpRequestData> = async ({
   context,
   step,
   publish,
+  executionId,
 }) => {
-  try {
-    await publish(
-      httpRequestChannel().status({
+  const channel = httpRequestChannel();
+  const changeNodeStatusUtil = async (status: NodeStatus) => {
+    await step.run("update-manual-trigger-node-status", async () => {
+      return updateNodeStatus({
+        channel,
         nodeId,
-        status: "loading",
-      }),
-    );
+        executionId,
+        status,
+        publish,
+      });
+    });
+  };
+  try {
+    await changeNodeStatusUtil("loading");
 
     await checkNodeCanExecute(nodeId);
 
     const safeData = httpRequestDataSchema.safeParse(data);
     if (!safeData.success) {
-      // Publish error state for HTTP request node
-      await publish(
-        httpRequestChannel().status({
-          nodeId,
-          status: "error",
-        }),
-      );
+      await changeNodeStatusUtil("error");
       throw new NonRetriableError(
         `Invalid data for HTTP Request node : ${safeData.error.issues.map((i) => i.message).join(", ")}`,
       );
@@ -90,21 +94,11 @@ export const httpRequestExecutor: NodeExecutor<HttpRequestData> = async ({
       };
     });
 
-    await publish(
-      httpRequestChannel().status({
-        nodeId,
-        status: "success",
-      }),
-    );
+    await changeNodeStatusUtil("success");
 
     return result;
   } catch (error) {
-    await publish(
-      httpRequestChannel().status({
-        nodeId,
-        status: "error",
-      }),
-    );
+    await changeNodeStatusUtil("error");
     throw error;
   }
 };

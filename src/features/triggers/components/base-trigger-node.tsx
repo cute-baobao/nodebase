@@ -2,11 +2,9 @@
 
 import { BaseHandle } from "@/components/react-flow/base-handle";
 import { BaseNode, BaseNodeContent } from "@/components/react-flow/base-node";
-import {
-  NodeStatus,
-  NodeStatusIndicator,
-} from "@/components/react-flow/node-status-indicator";
+import { NodeStatusIndicator } from "@/components/react-flow/node-status-indicator";
 import { WorkflowNode } from "@/components/workflow-node";
+import { NodeStatus } from "@/lib/configs/workflow-constants";
 import { NodeProps, Position, useReactFlow } from "@xyflow/react";
 import { LucideIcon } from "lucide-react";
 import Image from "next/image";

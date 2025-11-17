@@ -1,7 +1,9 @@
 import db from "@/db/instance";
 import { NodeExecutor } from "@/features/executions/type";
 import { openaiChannel } from "@/inngest/channels";
+import { updateNodeStatus } from "@/inngest/utils";
 import { OPENAI_AVAILABLE_MODELS } from "@/lib/configs/ai-constants";
+import { NodeStatus } from "@/lib/configs/workflow-constants";
 import { decrypt } from "@/lib/utils/encryption";
 import { createOpenAI } from "@ai-sdk/openai";
 import { generateText } from "ai";
@@ -26,25 +28,28 @@ export const openaiExecutor: NodeExecutor<OpenaiNodeData> = async ({
   step,
   userId,
   publish,
+  executionId,
 }) => {
-  try {
-    await publish(
-      openaiChannel().status({
+  const channel = openaiChannel();
+  const changeNodeStatusUtil = async (status: NodeStatus) => {
+    await step.run("update-manual-trigger-node-status", async () => {
+      return updateNodeStatus({
+        channel,
         nodeId,
-        status: "loading",
-      }),
-    );
+        executionId,
+        status,
+        publish,
+      });
+    });
+  };
+  try {
+    await changeNodeStatusUtil("loading");
 
     await checkNodeCanExecute(nodeId);
 
     const safeData = openaiDataSchema.safeParse(data);
     if (!safeData.success) {
-      await publish(
-        openaiChannel().status({
-          nodeId,
-          status: "error",
-        }),
-      );
+      await changeNodeStatusUtil("error");
       throw new NonRetriableError(
         `Invalid data for Openai node : ${safeData.error.issues.map((i) => i.message).join(", ")}`,
       );
@@ -62,12 +67,7 @@ export const openaiExecutor: NodeExecutor<OpenaiNodeData> = async ({
     });
 
     if (!credential) {
-      await publish(
-        openaiChannel().status({
-          nodeId,
-          status: "error",
-        }),
-      );
+      await changeNodeStatusUtil("error");
       throw new NonRetriableError("Openai credential not found");
     }
 
@@ -84,12 +84,8 @@ export const openaiExecutor: NodeExecutor<OpenaiNodeData> = async ({
 
     const text =
       steps[0].content[0].type === "text" ? steps[0].content[0].text : "";
-    await publish(
-      openaiChannel().status({
-        nodeId,
-        status: "success",
-      }),
-    );
+    await changeNodeStatusUtil("success");
+
     return {
       ...context,
       [safeData.data.variableName]: {
@@ -100,12 +96,7 @@ export const openaiExecutor: NodeExecutor<OpenaiNodeData> = async ({
       },
     };
   } catch (error) {
-    await publish(
-      openaiChannel().status({
-        nodeId,
-        status: "error",
-      }),
-    );
+    await changeNodeStatusUtil("error");
     throw error;
   }
 };

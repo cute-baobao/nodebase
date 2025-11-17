@@ -1,4 +1,5 @@
-import { NodeStatus } from "@/components/react-flow/node-status-indicator";
+
+import { NodeStatus } from "@/lib/configs/workflow-constants";
 import { channel, topic } from "@inngest/realtime";
 
 export const OPENAI_CHANNEL_NAME = "openai-execution";

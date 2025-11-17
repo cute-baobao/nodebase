@@ -10,3 +10,9 @@ export function prefetchWorkflows(params: Input) {
 export function prefetchSingleWorkflows(id: string) {
   return prefetch(trpc.workflows.getOne.queryOptions({ id }));
 }
+
+export function prefetchSingleWorkflowWithExecution(executionId: string) {
+  return prefetch(
+    trpc.workflows.getOneWithExecution.queryOptions({ executionId }),
+  );
+}

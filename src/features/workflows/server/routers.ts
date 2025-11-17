@@ -208,6 +208,52 @@ export const workflowsRouter = createTRPCRouter({
         hasPreviousPage,
       };
     }),
+  getOneWithExecution: protectedProcedure
+    .input(z.object({ executionId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const execution = await db.query.execution.findFirst({
+        where: (ex, { eq }) => eq(ex.id, input.executionId),
+      });
+
+      if (!execution) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `Execution with id ${input.executionId} not found`,
+        });
+      }
+
+      const data = await WorkflowDb.getOne({
+        workflowId: execution.workflowId,
+        userId: ctx.auth.user.id,
+      });
+
+      // transform nodes and connections to match React Flow format
+      const nodes: Node[] = data.nodes.map((node) => ({
+        id: node.id,
+        type: node.type,
+        position: node.position as { x: number; y: number },
+        data: {
+          ...(node.data as Record<string, unknown>),
+          executionId: execution.id,
+        },
+      }));
+
+      const edges: Edge[] = data.connections.map((connection) => ({
+        id: connection.id,
+        source: connection.fromNodeId,
+        target: connection.toNodeId,
+        sourceHandle: connection.fromOutput,
+        targetHandle: connection.toInput,
+        type: undefined,
+      }));
+
+      return {
+        id: data.id,
+        name: data.name,
+        nodes,
+        edges,
+      };
+    }),
 });
 
 // 提取出常用的数据库操作

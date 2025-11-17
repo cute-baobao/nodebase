@@ -1,5 +1,7 @@
 import { NodeExecutor } from "@/features/executions/type";
 import { stripeTriggerChannel } from "@/inngest/channels";
+import { updateNodeStatus } from "@/inngest/utils";
+import { NodeStatus } from "@/lib/configs/workflow-constants";
 
 type StripeTriggerData = Record<string, unknown>;
 
@@ -8,32 +10,31 @@ export const stripeTriggerExecutor: NodeExecutor<StripeTriggerData> = async ({
   nodeId,
   context,
   step,
+  executionId,
   publish,
 }) => {
-  try {
-    await publish(
-      stripeTriggerChannel().status({
+  const channel = stripeTriggerChannel();
+  const changeNodeStatusUtil = async (status: NodeStatus) => {
+    await step.run("update-stripe-trigger-node-status", async () => {
+      return updateNodeStatus({
+        channel,
         nodeId,
-        status: "loading",
-      }),
-    );
+        executionId,
+        status,
+        publish,
+      });
+    });
+  };
+
+  try {
+    await changeNodeStatusUtil("loading");
 
     const result = await step.run("stripe-trigger", async () => context);
 
-    await publish(
-      stripeTriggerChannel().status({
-        nodeId,
-        status: "success",
-      }),
-    );
+    await changeNodeStatusUtil("success");
     return result;
   } catch (error) {
-    await publish(
-      stripeTriggerChannel().status({
-        nodeId,
-        status: "error",
-      }),
-    );
+    await changeNodeStatusUtil("error");
     throw error;
   }
 };

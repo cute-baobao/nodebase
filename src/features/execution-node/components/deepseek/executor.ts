@@ -1,7 +1,9 @@
 import db from "@/db/instance";
 import { NodeExecutor } from "@/features/executions/type";
 import { deepseekChannel } from "@/inngest/channels";
+import { updateNodeStatus } from "@/inngest/utils";
 import { DEEPSEEK_AVAILABLE_MODELS } from "@/lib/configs/ai-constants";
+import { NodeStatus } from "@/lib/configs/workflow-constants";
 import { decrypt } from "@/lib/utils/encryption";
 import { createDeepSeek } from "@ai-sdk/deepseek";
 import { generateText } from "ai";
@@ -26,25 +28,28 @@ export const deepseekExecutor: NodeExecutor<DeepseekNodeData> = async ({
   step,
   userId,
   publish,
+  executionId,
 }) => {
-  try {
-    await publish(
-      deepseekChannel().status({
+  const channel = deepseekChannel();
+  const changeNodeStatusUtil = async (status: NodeStatus) => {
+    await step.run("update-manual-trigger-node-status", async () => {
+      return updateNodeStatus({
+        channel,
         nodeId,
-        status: "loading",
-      }),
-    );
+        executionId,
+        status,
+        publish,
+      });
+    });
+  };
+  try {
+    await changeNodeStatusUtil("loading");
 
     await checkNodeCanExecute(nodeId);
 
     const safeData = deepseekDataSchema.safeParse(data);
     if (!safeData.success) {
-      await publish(
-        deepseekChannel().status({
-          nodeId,
-          status: "error",
-        }),
-      );
+      await changeNodeStatusUtil("error");
       throw new NonRetriableError(
         `Invalid data for Deepseek node : ${safeData.error.issues.map((i) => i.message).join(", ")}`,
       );
@@ -62,12 +67,7 @@ export const deepseekExecutor: NodeExecutor<DeepseekNodeData> = async ({
     });
 
     if (!credential) {
-      await publish(
-        deepseekChannel().status({
-          nodeId,
-          status: "error",
-        }),
-      );
+      await changeNodeStatusUtil("error");
       throw new NonRetriableError("Deepseek credential not found");
     }
 
@@ -88,12 +88,7 @@ export const deepseekExecutor: NodeExecutor<DeepseekNodeData> = async ({
 
     const text =
       steps[0].content[0].type === "text" ? steps[0].content[0].text : "";
-    await publish(
-      deepseekChannel().status({
-        nodeId,
-        status: "success",
-      }),
-    );
+    await changeNodeStatusUtil("success");
     return {
       ...context,
       [safeData.data.variableName]: {
@@ -105,12 +100,7 @@ export const deepseekExecutor: NodeExecutor<DeepseekNodeData> = async ({
     };
   } catch (error) {
     console.error("Deepseek executor error:", error);
-    await publish(
-      deepseekChannel().status({
-        nodeId,
-        status: "error",
-      }),
-    );
+    await changeNodeStatusUtil("error");
     throw error;
   }
 };

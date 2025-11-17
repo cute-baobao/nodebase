@@ -1,11 +1,14 @@
+
 import { NodeExecutor } from "@/features/executions/type";
 import { discordChannel } from "@/inngest/channels";
+import { updateNodeStatus } from "@/inngest/utils";
 import Handlebars from "handlebars";
 import { decode } from "html-entities";
 import { NonRetriableError } from "inngest";
 import ky from "ky";
 import { checkNodeCanExecute } from "../../utils/check-node-can-execute";
 import { DiscordData, discordDataSchema } from "./schema";
+import { NodeStatus } from "@/lib/configs/workflow-constants";
 
 type DiscordNodeData = Partial<DiscordData>;
 
@@ -18,29 +21,31 @@ Handlebars.registerHelper("json", (context) => {
 export const discordExecutor: NodeExecutor<DiscordNodeData> = async ({
   data,
   nodeId,
-  userId,
   context,
   step,
   publish,
+  executionId,
 }) => {
-  try {
-    await publish(
-      discordChannel().status({
+  const channel = discordChannel();
+  const changeNodeStatusUtil = async (status: NodeStatus) => {
+    await step.run("update-manual-trigger-node-status", async () => {
+      return updateNodeStatus({
+        channel,
         nodeId,
-        status: "loading",
-      }),
-    );
+        executionId,
+        status,
+        publish,
+      });
+    });
+  };
+  try {
+    await changeNodeStatusUtil("loading");
 
     await checkNodeCanExecute(nodeId);
 
     const safeData = discordDataSchema.safeParse(data);
     if (!safeData.success) {
-      await publish(
-        discordChannel().status({
-          nodeId,
-          status: "error",
-        }),
-      );
+      await changeNodeStatusUtil("error");
       throw new NonRetriableError(
         `Invalid data for DISCORD node : ${safeData.error.issues.map((i) => i.message).join(", ")}`,
       );
@@ -68,20 +73,10 @@ export const discordExecutor: NodeExecutor<DiscordNodeData> = async ({
         },
       };
     });
-    await publish(
-      discordChannel().status({
-        nodeId,
-        status: "success",
-      }),
-    );
+    await changeNodeStatusUtil("success");
     return result;
   } catch (error) {
-    await publish(
-      discordChannel().status({
-        nodeId,
-        status: "error",
-      }),
-    );
+    await changeNodeStatusUtil("error");
     throw error;
   }
 };

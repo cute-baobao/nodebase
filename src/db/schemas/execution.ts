@@ -1,3 +1,4 @@
+
 import { InferSelectModel } from "drizzle-orm";
 import {
   index,
@@ -9,6 +10,7 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import { workflow } from "./workflow-schema";
+import { NodeStatus } from "@/lib/configs/workflow-constants";
 
 export const executionStatus = pgEnum("execution_status", [
   "SUCCESS",
@@ -33,8 +35,10 @@ export const execution = pgTable(
       .notNull(),
     startedAt: timestamp("started_at").defaultNow().notNull(),
     completedAt: timestamp("completed_at"),
-    output: jsonb(),
-    nodeStatus: jsonb().default("{}"),
+    output: jsonb().default("{}").$type<Record<string, unknown>>(),
+    nodeStatus: jsonb()
+      .default("{}")
+      .$type<Record<string, { status: NodeStatus; [key: string]: unknown }>>(),
   },
   (table) => [
     index("execution_workflowId_startedAt").on(

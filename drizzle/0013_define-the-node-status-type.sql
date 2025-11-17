@@ -1,0 +1,1 @@
+ALTER TABLE "execution" ALTER COLUMN "output" SET DEFAULT '{}';
