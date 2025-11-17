@@ -16,15 +16,14 @@ export function PureManualTriggerNode(props: NodeProps) {
     if (props.data?.status && props.data.executionId)
       return props.data.status as NodeStatus;
   }, [props.data]);
-  
-  const nodeStatus = status
-    ? status
-    : useNodeStatus({
-        nodeId: props.id,
-        channel: MANUAL_TRIGGER_CHANNEL_NAME,
-        topic: "status",
-        refreshToken: fetchManualTriggerRealtimeToken,
-      });
+
+  const nodeStatus = useNodeStatus({
+    initialStatus: status,
+    nodeId: props.id,
+    channel: MANUAL_TRIGGER_CHANNEL_NAME,
+    topic: "status",
+    refreshToken: fetchManualTriggerRealtimeToken,
+  });
 
   const handleOpenSetting = useCallback(() => {
     setDialogOpen(true);

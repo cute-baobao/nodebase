@@ -16,14 +16,13 @@ export function PureStripeTrigger(props: NodeProps) {
       return props.data.status as NodeStatus;
   }, [props.data]);
 
-  const nodeStatus = status
-    ? status
-    : useNodeStatus({
-        nodeId: props.id,
-        channel: STRIPE_TRIGGER_CHANNEL_NAME,
-        topic: "status",
-        refreshToken: fetchStripeTriggerRealtimeToken,
-      });
+  const nodeStatus = useNodeStatus({
+    initialStatus: status,
+    nodeId: props.id,
+    channel: STRIPE_TRIGGER_CHANNEL_NAME,
+    topic: "status",
+    refreshToken: fetchStripeTriggerRealtimeToken,
+  });
   const handleOpenSetting = useCallback(() => {
     setDialogOpen(true);
   }, [setDialogOpen]);

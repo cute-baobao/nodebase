@@ -31,14 +31,13 @@ function PureOpenaiNode(props: NodeProps<OpenaiNodeType>) {
     ? `${nodeData.model || OPENAI_AVAILABLE_MODELS[0]}: ${nodeData.userPrompt.slice(0, 50)}`
     : "Not configured";
 
-  const nodeStatus =
-    status ??
-    useNodeStatus({
-      nodeId: props.id,
-      channel: OPENAI_CHANNEL_NAME,
-      topic: "status",
-      refreshToken: fetchOpenaiRealtimeToken,
-    });
+  const nodeStatus = useNodeStatus({
+    initialStatus: status,
+    nodeId: props.id,
+    channel: OPENAI_CHANNEL_NAME,
+    topic: "status",
+    refreshToken: fetchOpenaiRealtimeToken,
+  });
 
   const handleSubmit = useCallback(
     (values: OpenaiNodeData) => {

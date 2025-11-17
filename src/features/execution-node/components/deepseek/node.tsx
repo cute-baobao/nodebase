@@ -27,14 +27,13 @@ function PureDeepseekNode(props: NodeProps<DeepseekNodeType>) {
     ? `${nodeData.model || DEEPSEEK_AVAILABLE_MODELS[0]}: ${nodeData.userPrompt.slice(0, 50)}`
     : "Not configured";
 
-  const nodeStatus =
-    status ??
-    useNodeStatus({
-      nodeId: props.id,
-      channel: DEEPSEEK_CHANNEL_NAME,
-      topic: "status",
-      refreshToken: fetchDeepseekRealtimeToken,
-    });
+  const nodeStatus = useNodeStatus({
+    initialStatus: status,
+    nodeId: props.id,
+    channel: DEEPSEEK_CHANNEL_NAME,
+    topic: "status",
+    refreshToken: fetchDeepseekRealtimeToken,
+  });
 
   const handleSubmit = useCallback(
     (values: DeepseekNodeData) => {

@@ -27,7 +27,8 @@ function PureDiscordNode(props: NodeProps<DiscordNodeType>) {
     ? `Send: ${nodeData.content.slice(0, 50)}`
     : "Not configured";
 
-  const nodeStatus = status ?? useNodeStatus({
+  const nodeStatus = useNodeStatus({
+    initialStatus: status,
     nodeId: props.id,
     channel: DISCORD_CHANNEL_NAME,
     topic: "status",

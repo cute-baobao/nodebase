@@ -14,15 +14,14 @@ export function PureGoogleFormTrigger(props: NodeProps) {
     if (props.data?.status && props.data.executionId)
       return props.data.status as NodeStatus;
   }, [props.data]);
-  
-  const nodeStatus =
-    status ??
-    useNodeStatus({
-      nodeId: props.id,
-      channel: GOOGLE_FORM_TRIGGER_CHANNEL_NAME,
-      topic: "status",
-      refreshToken: fetchGoogleFormTriggerRealtimeToken,
-    });
+
+  const nodeStatus = useNodeStatus({
+    initialStatus: status,
+    nodeId: props.id,
+    channel: GOOGLE_FORM_TRIGGER_CHANNEL_NAME,
+    topic: "status",
+    refreshToken: fetchGoogleFormTriggerRealtimeToken,
+  });
   const handleOpenSetting = useCallback(() => {
     setDialogOpen(true);
   }, [setDialogOpen]);

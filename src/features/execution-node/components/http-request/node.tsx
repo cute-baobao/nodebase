@@ -34,7 +34,8 @@ function PureHttpRequestNode(props: NodeProps<HttpRequestNodeType>) {
     ? `${nodeData.method || "GET"}:${nodeData.endpoint}`
     : "Not configured";
 
-  const nodeStatus = status ?? useNodeStatus({
+  const nodeStatus = useNodeStatus({
+    initialStatus: status,
     nodeId: props.id,
     channel: HTTP_REQUEST_CHANNEL_NAME,
     topic: "status",

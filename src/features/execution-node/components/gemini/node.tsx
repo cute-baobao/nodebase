@@ -32,7 +32,8 @@ function PureGeminiNode(props: NodeProps<GeminiNodeType>) {
     ? `${nodeData.model || GEMINI_AVAILABLE_MODELS[0]}: ${nodeData.userPrompt.slice(0, 50)}`
     : "Not configured";
 
-  const nodeStatus = status ?? useNodeStatus({
+  const nodeStatus = useNodeStatus({
+    initialStatus: status,
     nodeId: props.id,
     channel: GEMINI_CHANNEL_NAME,
     topic: "status",
