@@ -29,4 +29,4 @@ export const edgeTypes: EdgeTypes = {
   edgeWithToolbar: EdgeWithToolbar,
 };
 
-export type NodeStatus = "loading" | "success" | "error" | "initial" | "retry";
+export type NodeStatus = "loading" | "success" | "error" | "initial" | "retring";

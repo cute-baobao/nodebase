@@ -235,6 +235,7 @@ export const workflowsRouter = createTRPCRouter({
         data: {
           ...(node.data as Record<string, unknown>),
           executionId: execution.id,
+          status: execution.nodeStatus?.[node.id]?.status ?? "initial",
         },
       }));
 

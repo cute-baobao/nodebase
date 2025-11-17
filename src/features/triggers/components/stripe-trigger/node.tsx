@@ -1,19 +1,29 @@
 import { useNodeStatus } from "@/features/execution-node/hooks/use-node-status";
 import { STRIPE_TRIGGER_CHANNEL_NAME } from "@/inngest/channels";
+import { NodeStatus } from "@/lib/configs/workflow-constants";
 import { NodeProps } from "@xyflow/react";
-import { memo, useCallback, useState } from "react";
+import { memo, useCallback, useMemo, useState } from "react";
 import { BaseTriggerNode } from "../base-trigger-node";
 import { fetchStripeTriggerRealtimeToken } from "./actions";
 import { StripeTriggerDialog } from "./dialog";
 
 export function PureStripeTrigger(props: NodeProps) {
   const [dialogOpen, setDialogOpen] = useState(false);
-  const nodeStatus = useNodeStatus({
-    nodeId: props.id,
-    channel: STRIPE_TRIGGER_CHANNEL_NAME,
-    topic: "status",
-    refreshToken: fetchStripeTriggerRealtimeToken,
-  });
+
+  const status = useMemo(() => {
+    // ensure now in execution page
+    if (props.data?.status && props.data.executionId)
+      return props.data.status as NodeStatus;
+  }, [props.data]);
+
+  const nodeStatus = status
+    ? status
+    : useNodeStatus({
+        nodeId: props.id,
+        channel: STRIPE_TRIGGER_CHANNEL_NAME,
+        topic: "status",
+        refreshToken: fetchStripeTriggerRealtimeToken,
+      });
   const handleOpenSetting = useCallback(() => {
     setDialogOpen(true);
   }, [setDialogOpen]);

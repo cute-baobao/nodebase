@@ -99,8 +99,11 @@ export const deepseekExecutor: NodeExecutor<DeepseekNodeData> = async ({
       },
     };
   } catch (error) {
-    console.error("Deepseek executor error:", error);
-    await changeNodeStatusUtil("error");
+    if (error instanceof NonRetriableError) {
+      await changeNodeStatusUtil("error");
+    } else {
+      await changeNodeStatusUtil("retring");
+    }
     throw error;
   }
 };

@@ -7,13 +7,14 @@ import {
 } from "@/components/ui/card";
 import { Execution } from "@/db";
 import { useSuspenseSingleWorkflowWithExecution } from "@/features/workflows/hooks/use-workflows";
-import { edgeTypes, nodeComponents } from "@/lib/configs/workflow-constants";
+import { nodeComponents } from "@/lib/configs/workflow-constants";
 import {
   addEdge,
   applyEdgeChanges,
   applyNodeChanges,
   Background,
   Connection,
+  Controls,
   Edge,
   EdgeChange,
   Node,
@@ -93,15 +94,9 @@ function WorkflowExecutionStatus() {
         fitView
         fitViewOptions={{ padding: 0.2 }}
         nodeTypes={nodeComponents}
-        edgeTypes={edgeTypes}
-        zoomOnScroll={false}
-        zoomOnPinch={false}
-        zoomOnDoubleClick={false}
-        panOnScroll={false}
-        panOnDrag={false}
-        selectionOnDrag={false}
       >
         <Background />
+        <Controls />
       </ReactFlow>
     </div>
   );

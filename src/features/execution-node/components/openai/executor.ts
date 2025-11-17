@@ -96,7 +96,11 @@ export const openaiExecutor: NodeExecutor<OpenaiNodeData> = async ({
       },
     };
   } catch (error) {
-    await changeNodeStatusUtil("error");
+    if (error instanceof NonRetriableError) {
+      await changeNodeStatusUtil("error");
+    } else {
+      await changeNodeStatusUtil("retring");
+    }
     throw error;
   }
 };

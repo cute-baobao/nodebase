@@ -1,20 +1,29 @@
 import { HTTP_REQUEST_CHANNEL_NAME } from "@/inngest/channels/http-request";
+import { NodeStatus } from "@/lib/configs/workflow-constants";
 import { Node, NodeProps, useReactFlow } from "@xyflow/react";
 import { GlobeIcon } from "lucide-react";
-import { memo, useCallback, useState } from "react";
+import { memo, useCallback, useMemo, useState } from "react";
 import { useNodeStatus } from "../../hooks/use-node-status";
 import { BaseExecutionNode } from "../base-execution-node";
 import { fetchHttpRequestRealtimeToken } from "./actions";
 import { HttpRequestDialog } from "./dialog";
 import { HttpRequestData } from "./schema";
 
-type HttpRequestNodeData = Partial<HttpRequestData>
+type HttpRequestNodeData = Partial<
+  HttpRequestData & { [key: string]: unknown }
+>;
 
 type HttpRequestNodeType = Node<HttpRequestNodeData>;
 
 function PureHttpRequestNode(props: NodeProps<HttpRequestNodeType>) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const { setNodes } = useReactFlow();
+
+  const status = useMemo(() => {
+    // ensure now in execution page
+    if (props.data?.status && props.data.executionId)
+      return props.data.status as NodeStatus;
+  }, [props.data]);
 
   const handleOnSetting = useCallback(() => {
     setDialogOpen(true);
@@ -25,7 +34,7 @@ function PureHttpRequestNode(props: NodeProps<HttpRequestNodeType>) {
     ? `${nodeData.method || "GET"}:${nodeData.endpoint}`
     : "Not configured";
 
-  const nodeStatus = useNodeStatus({
+  const nodeStatus = status ?? useNodeStatus({
     nodeId: props.id,
     channel: HTTP_REQUEST_CHANNEL_NAME,
     topic: "status",

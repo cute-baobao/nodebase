@@ -1,13 +1,14 @@
 import { DISCORD_CHANNEL_NAME } from "@/inngest/channels";
+import { NodeStatus } from "@/lib/configs/workflow-constants";
 import { Node, NodeProps, useReactFlow } from "@xyflow/react";
-import { memo, useCallback, useState } from "react";
+import { memo, useCallback, useMemo, useState } from "react";
 import { useNodeStatus } from "../../hooks/use-node-status";
 import { BaseExecutionNode } from "../base-execution-node";
 import { fetchDiscordRealtimeToken } from "./actions";
 import { DiscordDialog } from "./dialog";
 import { DiscordData } from "./schema";
 
-type DiscordNodeData = Partial<DiscordData>;
+type DiscordNodeData = Partial<DiscordData & { [key: string]: unknown }>;
 
 type DiscordNodeType = Node<DiscordNodeData>;
 
@@ -15,16 +16,18 @@ function PureDiscordNode(props: NodeProps<DiscordNodeType>) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const { setNodes } = useReactFlow();
 
-  const handleOnSetting = useCallback(() => {
-    setDialogOpen(true);
-  }, [setDialogOpen]);
+  const status = useMemo(() => {
+    // ensure now in execution page
+    if (props.data?.status && props.data.executionId)
+      return props.data.status as NodeStatus;
+  }, [props.data]);
 
   const nodeData = props.data;
   const description = nodeData.content
     ? `Send: ${nodeData.content.slice(0, 50)}`
     : "Not configured";
 
-  const nodeStatus = useNodeStatus({
+  const nodeStatus = status ?? useNodeStatus({
     nodeId: props.id,
     channel: DISCORD_CHANNEL_NAME,
     topic: "status",
@@ -49,6 +52,10 @@ function PureDiscordNode(props: NodeProps<DiscordNodeType>) {
     },
     [setNodes, props.id],
   );
+
+  const handleOnSetting = useCallback(() => {
+    setDialogOpen(true);
+  }, [setDialogOpen]);
 
   return (
     <>
