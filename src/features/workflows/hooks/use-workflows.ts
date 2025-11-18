@@ -1,6 +1,7 @@
 import { useTRPC } from "@/lib/providers/trpc-client-provider";
 import {
   useMutation,
+  useQuery,
   useQueryClient,
   useSuspenseQuery,
 } from "@tanstack/react-query";
@@ -26,6 +27,18 @@ export const useSuspenseWorkflows = () => {
 export const useSuspenseSingleWorkflow = (id: string) => {
   const trpc = useTRPC();
   return useSuspenseQuery(trpc.workflows.getOne.queryOptions({ id }));
+};
+
+/**
+ * @description Custom hook to fetch single workflows using suspense.
+ * @param executionId execution id
+ * @returns A suspense query for fetching single workflows.
+ */
+export const useSuspenseSingleWorkflowWithExecution = (executionId: string) => {
+  const trpc = useTRPC();
+  return useSuspenseQuery(
+    trpc.workflows.getOneWithExecution.queryOptions({ executionId }),
+  );
 };
 
 /**
@@ -132,4 +145,10 @@ export const useExecuteWorkflow = () => {
       },
     }),
   );
+};
+
+export const useGetOneWorkflow = (id: string) => {
+  const trpc = useTRPC();
+
+  return useQuery(trpc.workflows.getOne.queryOptions({ id }));
 };

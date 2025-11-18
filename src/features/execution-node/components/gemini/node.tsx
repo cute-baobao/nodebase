@@ -1,20 +1,27 @@
 import { GEMINI_CHANNEL_NAME } from "@/inngest/channels";
 import { GEMINI_AVAILABLE_MODELS } from "@/lib/configs/ai-constants";
 import { Node, NodeProps, useReactFlow } from "@xyflow/react";
-import { memo, useCallback, useState } from "react";
+import { memo, useCallback, useMemo, useState } from "react";
 import { useNodeStatus } from "../../hooks/use-node-status";
 import { BaseExecutionNode } from "../base-execution-node";
 import { fetchGeminiRealtimeToken } from "./actions";
 import { GeminiDialog } from "./dialog";
 import { GeminiData } from "./schema";
+import { NodeStatus } from "@/lib/configs/workflow-constants";
 
-type GeminiNodeData = Partial<GeminiData>;
+type GeminiNodeData = Partial<GeminiData & { [key: string]: unknown }>;
 
 type GeminiNodeType = Node<GeminiNodeData>;
 
 function PureGeminiNode(props: NodeProps<GeminiNodeType>) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const { setNodes } = useReactFlow();
+
+  const status = useMemo(() => {
+    // ensure now in execution page
+    if (props.data?.status && props.data.executionId)
+      return props.data.status as NodeStatus;
+  }, [props.data]); 
 
   const handleOnSetting = useCallback(() => {
     setDialogOpen(true);
@@ -26,6 +33,7 @@ function PureGeminiNode(props: NodeProps<GeminiNodeType>) {
     : "Not configured";
 
   const nodeStatus = useNodeStatus({
+    initialStatus: status,
     nodeId: props.id,
     channel: GEMINI_CHANNEL_NAME,
     topic: "status",

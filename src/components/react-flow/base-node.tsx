@@ -1,7 +1,12 @@
+import { NodeStatus } from "@/lib/configs/workflow-constants";
 import { cn } from "@/lib/utils/index";
-import { CheckCircle2Icon, Loader2Icon, XCircleIcon } from "lucide-react";
+import {
+  CheckCircle2Icon,
+  Loader2Icon,
+  RotateCwIcon,
+  XCircleIcon,
+} from "lucide-react";
 import { forwardRef, type HTMLAttributes } from "react";
-import { NodeStatus } from "./node-status-indicator";
 
 interface BaseNodeProps extends HTMLAttributes<HTMLDivElement> {
   status?: NodeStatus;
@@ -34,6 +39,9 @@ export const BaseNode = forwardRef<HTMLDivElement, BaseNodeProps>(
       )}
       {status === "loading" && (
         <Loader2Icon className="absolute -right-0.5 -bottom-0.5 size-2 animate-spin stroke-3 text-blue-700" />
+      )}
+      {status === "retrying" && (
+        <RotateCwIcon className="absolute -right-0.5 -bottom-0.5 size-2 animate-spin stroke-3 text-yellow-700" />
       )}
     </div>
   ),

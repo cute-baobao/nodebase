@@ -1,9 +1,10 @@
-import { NodeStatus } from "@/components/react-flow/node-status-indicator";
+import { NodeStatus } from "@/lib/configs/workflow-constants";
 import { Realtime } from "@inngest/realtime";
 import { useInngestSubscription } from "@inngest/realtime/hooks";
 import { useEffect, useState } from "react";
 
 interface UseNodeStatusOptions {
+  initialStatus?: NodeStatus;
   nodeId: string;
   channel: string;
   topic: string;
@@ -11,12 +12,13 @@ interface UseNodeStatusOptions {
 }
 
 export function useNodeStatus({
+  initialStatus = "initial",
   nodeId,
   channel,
   topic,
   refreshToken,
 }: UseNodeStatusOptions) {
-  const [status, setStatus] = useState<NodeStatus>("initial");
+  const [status, setStatus] = useState<NodeStatus>(initialStatus);
   const { data } = useInngestSubscription({
     refreshToken,
     enabled: true,

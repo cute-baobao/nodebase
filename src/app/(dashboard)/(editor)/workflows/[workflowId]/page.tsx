@@ -9,6 +9,7 @@ import { requireAuth } from "@/lib/utils";
 import { HydrateClient } from "@/trpc/server";
 import { Suspense } from "react";
 import { ErrorBoundary } from "react-error-boundary";
+import "@xyflow/react/dist/style.css";
 
 interface WorkflowEditorPageProps {
   params: Promise<{

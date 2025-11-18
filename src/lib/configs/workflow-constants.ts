@@ -1,3 +1,4 @@
+import { EdgeWithToolbar } from "@/components/edge-with-toolbar";
 import { InitialNode } from "@/components/initial-node";
 import { NodeTypeValues } from "@/db";
 import { DeepseekNode } from "@/features/execution-node/components/deepseek/node";
@@ -8,7 +9,7 @@ import { OpenaiNode } from "@/features/execution-node/components/openai/node";
 import { GoogleFormTrigger } from "@/features/triggers/components/google-form-trigger/node";
 import { ManualTriggerNode } from "@/features/triggers/components/manual-trigger/node";
 import { StripeTrigger } from "@/features/triggers/components/stripe-trigger/node";
-import { NodeTypes } from "@xyflow/react";
+import { EdgeTypes, NodeTypes } from "@xyflow/react";
 
 export const nodeComponents = {
   [NodeTypeValues[0]]: InitialNode,
@@ -23,3 +24,9 @@ export const nodeComponents = {
 } as const satisfies NodeTypes;
 
 export type RegisteredNodeType = keyof typeof nodeComponents;
+
+export const edgeTypes: EdgeTypes = {
+  edgeWithToolbar: EdgeWithToolbar,
+};
+
+export type NodeStatus = "loading" | "success" | "error" | "initial" | "retrying";

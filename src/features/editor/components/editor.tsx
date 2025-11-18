@@ -1,17 +1,15 @@
 "use client";
 
-import { EdgeWithToolbar } from "@/components/edge-with-toolbar";
 import { ErrorView, LoadingView } from "@/components/entity-components";
 import { NodeTypeValues } from "@/db";
 import { useSuspenseSingleWorkflow } from "@/features/workflows/hooks/use-workflows";
-import { nodeComponents } from "@/lib/configs/node-components";
+import { edgeTypes, nodeComponents } from "@/lib/configs/workflow-constants";
 import {
   addEdge,
   applyEdgeChanges,
   applyNodeChanges,
   Background,
   Controls,
-  EdgeTypes,
   MiniMap,
   Panel,
   ReactFlow,
@@ -22,13 +20,13 @@ import {
   type Node,
   type NodeChange,
 } from "@xyflow/react";
-import "@xyflow/react/dist/style.css";
 import { useSetAtom } from "jotai";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { editorAtom } from "../store/atoms";
 import { AddNodeButton } from "./add-node-button";
 import { ExecuteWorkflowButton } from "./execute-workflow-button";
 import { FormatLayoutButton } from "./format-layout-button";
+
 
 export function EditorLoading() {
   return <LoadingView message="Loading editor..." />;
@@ -37,10 +35,6 @@ export function EditorLoading() {
 export function EditorError() {
   return <ErrorView message="Error loading editor" />;
 }
-
-const edgeType: EdgeTypes = {
-  edgeWithToolbar: EdgeWithToolbar,
-};
 
 export function Editor({ workflowId }: { workflowId: string }) {
   const { data: workflow } = useSuspenseSingleWorkflow(workflowId);
@@ -109,7 +103,7 @@ export function Editor({ workflowId }: { workflowId: string }) {
         onReconnectStart={onReconnectStart}
         onReconnectEnd={onReconnectEnd}
         snapToGrid
-        edgeTypes={edgeType}
+        edgeTypes={edgeTypes}
       >
         <Background />
         <Controls />

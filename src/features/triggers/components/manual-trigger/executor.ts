@@ -1,39 +1,41 @@
 import { NodeExecutor } from "@/features/executions/type";
 import { manualTriggerChannel } from "@/inngest/channels/manual-trigger";
+import { updateNodeStatus } from "@/inngest/utils";
+import { NodeStatus } from "@/lib/configs/workflow-constants";
 
 type ManualTriggerData = Record<string, unknown>;
 
 export const manualTriggerExecutor: NodeExecutor<ManualTriggerData> = async ({
   data,
+  executionId,
   nodeId,
   context,
   step,
   publish,
 }) => {
-  try {
-    await publish(
-      manualTriggerChannel().status({
+  const channel = manualTriggerChannel();
+
+  const changeNodeStatusUtil = async (status: NodeStatus) => {
+    await step.run("update-manual-trigger-node-status", async () => {
+      return updateNodeStatus({
+        channel,
         nodeId,
-        status: "loading",
-      }),
-    );
+        executionId,
+        status,
+        publish,
+      });
+    });
+  };
+
+  try {
+    await changeNodeStatusUtil("loading");
 
     const result = await step.run("manual-trigger", async () => context);
 
-    await publish(
-      manualTriggerChannel().status({
-        nodeId,
-        status: "success",
-      }),
-    );
+    await changeNodeStatusUtil("success");
     return result;
   } catch (error) {
-    await publish(
-      manualTriggerChannel().status({
-        nodeId,
-        status: "error",
-      }),
-    );
+    await changeNodeStatusUtil("error");
     throw error;
   }
 };

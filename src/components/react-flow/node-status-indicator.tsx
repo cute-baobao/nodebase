@@ -1,9 +1,7 @@
-import { LoaderCircle } from "lucide-react";
+import { NodeStatus } from "@/lib/configs/workflow-constants";
+import { cn } from "@/lib/utils";
+import { LoaderCircle, RotateCwIcon } from "lucide-react";
 import { type ReactNode } from "react";
-
-import { cn } from "@/lib/utils/index";
-
-export type NodeStatus = "loading" | "success" | "error" | "initial" | "retry";
 
 export type NodeStatusVariant = "overlay" | "border";
 
@@ -28,6 +26,25 @@ export const SpinnerLoadingIndicator = ({
         <span className="absolute top-[calc(50%-1.25rem)] left-[calc(50%-1.25rem)] inline-block h-10 w-10 animate-ping rounded-full bg-blue-700/20" />
 
         <LoaderCircle className="absolute top-[calc(50%-0.75rem)] left-[calc(50%-0.75rem)] size-6 animate-spin text-blue-700" />
+      </div>
+    </div>
+  );
+};
+
+export const RetryLoadingIndicator = ({
+  children,
+}: {
+  children: ReactNode;
+}) => {
+  return (
+    <div className="relative">
+      <StatusBorder className="border-yellow-700/40">{children}</StatusBorder>
+
+      <div className="bg-background/50 absolute inset-0 z-50 rounded-[7px] backdrop-blur-sm" />
+      <div className="absolute inset-0 z-50">
+        <span className="absolute top-[calc(50%-1.25rem)] left-[calc(50%-1.25rem)] inline-block h-10 w-10 animate-pulse rounded-full bg-yellow-700/20" />
+
+        <RotateCwIcon className="absolute top-[calc(50%-0.75rem)] left-[calc(50%-0.75rem)] size-6 animate-spin text-yellow-700" />
       </div>
     </div>
   );
@@ -66,7 +83,48 @@ export const BorderLoadingIndicator = ({
             className,
           )}
         >
-          <div className="spinner rounded-full bg-[conic-gradient(from_0deg_at_50%_50%,_rgba(42,67,233,0.5)_0deg,_rgba(42,138,246,0)_360deg)]" />
+          <div className="spinner rounded-full bg-[conic-gradient(from_0deg_at_50%_50%,rgba(42,67,233,0.5)_0deg,rgba(42,138,246,0)_360deg)]" />
+        </div>
+      </div>
+      {children}
+    </>
+  );
+};
+
+export const BorderRetryIndicator = ({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) => {
+  return (
+    <>
+      <div className="absolute -top-[2px] -left-[2px] h-[calc(100%+4px)] w-[calc(100%+4px)]">
+        <style>
+          {`
+        @keyframes spin {
+          from { transform: translate(-50%, -50%) rotate(0deg); }
+          to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        .spinner-retry {
+          animation: spin 2s linear infinite;
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          width: 140%;
+          aspect-ratio: 1;
+          transform-origin: center;
+        }
+      `}
+        </style>
+        <div
+          className={cn(
+            "absolute inset-0 overflow-hidden rounded-sm",
+            className,
+          )}
+        >
+          <div className="spinner-retry rounded-full bg-[conic-gradient(from_0deg_at_50%_50%,rgba(180,83,9,0.5)_0deg,rgba(234,179,8,0)_360deg)]" />
         </div>
       </div>
       {children}
@@ -110,6 +168,19 @@ export const NodeStatusIndicator = ({
             <BorderLoadingIndicator className={className}>
               {children}
             </BorderLoadingIndicator>
+          );
+        default:
+          return <>{children}</>;
+      }
+    case "retrying":
+      switch (variant) {
+        case "overlay":
+          return <RetryLoadingIndicator>{children}</RetryLoadingIndicator>;
+        case "border":
+          return (
+            <BorderRetryIndicator className={className}>
+              {children}
+            </BorderRetryIndicator>
           );
         default:
           return <>{children}</>;
