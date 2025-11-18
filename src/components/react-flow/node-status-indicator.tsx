@@ -172,7 +172,7 @@ export const NodeStatusIndicator = ({
         default:
           return <>{children}</>;
       }
-    case "retring":
+    case "retrying":
       switch (variant) {
         case "overlay":
           return <RetryLoadingIndicator>{children}</RetryLoadingIndicator>;

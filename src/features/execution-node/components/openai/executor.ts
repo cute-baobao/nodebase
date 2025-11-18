@@ -99,7 +99,7 @@ export const openaiExecutor: NodeExecutor<OpenaiNodeData> = async ({
     if (error instanceof NonRetriableError) {
       await changeNodeStatusUtil("error");
     } else {
-      await changeNodeStatusUtil("retring");
+      await changeNodeStatusUtil("retrying");
     }
     throw error;
   }

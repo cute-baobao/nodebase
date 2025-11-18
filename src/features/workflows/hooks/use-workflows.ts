@@ -31,7 +31,7 @@ export const useSuspenseSingleWorkflow = (id: string) => {
 
 /**
  * @description Custom hook to fetch single workflows using suspense.
- * @param id workflow id
+ * @param executionId execution id
  * @returns A suspense query for fetching single workflows.
  */
 export const useSuspenseSingleWorkflowWithExecution = (executionId: string) => {

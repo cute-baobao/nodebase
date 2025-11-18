@@ -40,7 +40,7 @@ export const BaseNode = forwardRef<HTMLDivElement, BaseNodeProps>(
       {status === "loading" && (
         <Loader2Icon className="absolute -right-0.5 -bottom-0.5 size-2 animate-spin stroke-3 text-blue-700" />
       )}
-      {status === "retring" && (
+      {status === "retrying" && (
         <RotateCwIcon className="absolute -right-0.5 -bottom-0.5 size-2 animate-spin stroke-3 text-yellow-700" />
       )}
     </div>
