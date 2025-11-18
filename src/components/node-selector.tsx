@@ -52,12 +52,6 @@ const executionNodes: NodeTypeOption[] = [
     icon: GlobeIcon,
   },
   {
-    type: NodeTypeValues[5],
-    label: "OpenAI",
-    description: "Use OpenAI to generate text",
-    icon: "/logos/openai.svg",
-  },
-  {
     type: NodeTypeValues[6],
     label: "Gemini",
     description: "Use Google Gemini to generate text",
@@ -74,6 +68,12 @@ const executionNodes: NodeTypeOption[] = [
     label: "Discord",
     description: "Use Discord to send messages",
     icon: "/logos/discord.svg",
+  },
+  {
+    type: NodeTypeValues[9],
+    label: "Resend",
+    description: "Use Resend to send email",
+    icon: "/logos/resend.svg",
   },
 ];
 

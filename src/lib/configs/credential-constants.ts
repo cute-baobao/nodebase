@@ -16,6 +16,11 @@ export const credentialTypeOptions = [
     label: "Deepseek",
     logo: "/logos/deepseek.svg",
   },
+  {
+    value: CredentialTypeValues[3],
+    label: "Resend",
+    logo: "/logos/resend.svg",
+  }
 ];
 
 export const getCredentialLogo = (type: string) => {

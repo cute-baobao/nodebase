@@ -4,6 +4,7 @@ import { discordExecutor } from "@/features/execution-node/components/discord/ex
 import { geminiExecutor } from "@/features/execution-node/components/gemini/executor";
 import { httpRequestExecutor } from "@/features/execution-node/components/http-request/executor";
 import { openaiExecutor } from "@/features/execution-node/components/openai/executor";
+import { resendExecutor } from "@/features/execution-node/components/resend/executor";
 import { NodeExecutor } from "@/features/executions/type";
 import { googleFormTriggerExecutor } from "@/features/triggers/components/google-form-trigger/executor";
 import { manualTriggerExecutor } from "@/features/triggers/components/manual-trigger/executor";
@@ -28,6 +29,8 @@ export const executeRegistry: Record<NodeType, NodeExecutor> = {
   [NodeTypeValues[7]]: deepseekExecutor,
   // DISCORD
   [NodeTypeValues[8]]: discordExecutor,
+  // RESEND
+  [NodeTypeValues[9]]: resendExecutor,
 };
 
 export const getExecutor = (type: NodeType): NodeExecutor => {

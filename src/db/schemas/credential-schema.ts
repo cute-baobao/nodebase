@@ -7,6 +7,7 @@ export const credentialType = pgEnum("credential_type", [
   "OPENAI",
   "GEMINI",
   "DEEPSEEK",
+  "RESEND"
 ]);
 
 export const CredentialTypeValues = credentialType.enumValues;

@@ -9,10 +9,11 @@ import {
   googleFormTriggerChannel,
   httpRequestChannel,
   manualTriggerChannel,
+  discordChannel,
+  geminiChannel,
+  openaiChannel,
+  resendChannel
 } from "./channels";
-import { discordChannel } from "./channels/discord";
-import { geminiChannel } from "./channels/gemini";
-import { openaiChannel } from "./channels/openai";
 import { inngest } from "./client";
 import { topologicalSort } from "./utils";
 
@@ -42,6 +43,7 @@ export const executeWorkflow = inngest.createFunction(
       deepseekChannel(),
       openaiChannel(),
       discordChannel(),
+      resendChannel(),
     ],
   },
   async ({ event, step, publish }) => {
