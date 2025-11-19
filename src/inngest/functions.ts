@@ -162,7 +162,7 @@ export const scheduleWorkflowExecution = inngest.createFunction(
       const nextRun = calculateNextRun(cronExpression, tz);
       return inngest.send({
         name: "workflows/schedule.workflow",
-        data: { workflowId },
+        data: { workflowId, cronExpression, tz },
         ts: nextRun.getTime(),
       });
     });

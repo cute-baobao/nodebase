@@ -151,18 +151,17 @@ export function EditorSaveButton() {
 export function EditorActiveToggle() {
   const { workflowId } = use(EditorHeaderContext);
   const { data: workflow } = useSuspenseSingleWorkflow(workflowId);
-  const editor = useAtomValue(editorAtom);
   const updateWorkflow = useUpdatedWorkflowActive();
 
   // Check if there are any WebhookTrigger or CRON_TRIGGER nodes
   const haveWebhookOrCronNodes = useMemo(() => {
-    if (!editor) return false;
-    const nodes = editor.getNodes();
+    if (!workflow.nodes) return false;
+    const nodes = workflow.nodes;
     return nodes.some(
       (node) =>
         node.type && CRON_AND_WEBHOOK_NODES.includes(node.type as NodeType),
     );
-  }, [editor]);
+  }, [workflow.nodes]);
 
   if (!haveWebhookOrCronNodes) return null;
 
@@ -177,7 +176,7 @@ export function EditorActiveToggle() {
         id="airplane-mode"
       />
       <Label htmlFor="airplane-mode">
-        {workflow.active ? "Inactive" : "Active"}
+        {workflow.active ? "Active" : "Inactive"}
       </Label>
     </div>
   );

@@ -70,9 +70,7 @@ export function ResendDialog({
 
   const addEmailField = useCallback(() => {
     append({ email: "" });
-    console.log("Appended email field");
-    console.log(fields);
-  }, [append, fields]);
+  }, [append]);
 
   const removeEmailField = useCallback(
     (index: number) => fields.length > 1 && remove(index),
@@ -87,7 +85,6 @@ export function ResendDialog({
 
   const handleSubmit = useCallback(
     (data: ResendData) => {
-      console.log("Form submitted with data:", data);
       onSubmit(data);
       onOpenChange(false);
     },
@@ -134,7 +131,7 @@ export function ResendDialog({
                     </FormControl>
                     <FormDescription>
                       Use this name to reference the result in other node:{" "}
-                      {`{{${watchVariableName}.aiResponse.text}}`}
+                      {`{{${watchVariableName}.id}}`}
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -256,8 +253,8 @@ export function ResendDialog({
                       </div>
                     </FormControl>
                     <FormDescription>
-                      The recipient email addresses. Separate multiple emails
-                      with commas.
+                      Add one or more recipient email addresses. Click{" "}
+                      {'"Add Email"'} to add additional recipients
                     </FormDescription>
                     <FormMessage />
                   </FormItem>

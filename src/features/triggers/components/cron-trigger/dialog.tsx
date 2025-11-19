@@ -26,7 +26,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { CronJobData, cronJobDataSchema } from "./schema";
 
@@ -43,12 +43,11 @@ export function CronJobDialog({
   onSubmit,
   defaultValues = {},
 }: CronJobDialogProps) {
-  const submitButtonRef = useRef<HTMLButtonElement>(null);
   const form = useForm<CronJobData>({
     resolver: zodResolver(cronJobDataSchema),
     defaultValues: {
       variableName: defaultValues.variableName || "",
-      cronExpression: defaultValues.cronExpression || "* * * * *",
+      cronExpression: defaultValues.cronExpression || "",
       timezone: defaultValues.timezone || "UTC",
     },
   });
