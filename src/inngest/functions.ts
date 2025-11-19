@@ -1,21 +1,27 @@
 import { execution, NodeType } from "@/db";
 import db from "@/db/instance";
+import { checkWorkflowActive } from "@/features/triggers/utils/check-workflow-active";
 import { WorkflowDb } from "@/features/workflows/server/routers";
 import { getExecutor } from "@/lib/configs/executor-registry";
 import { and, eq } from "drizzle-orm";
 import { NonRetriableError } from "inngest";
 import {
+  cronTriggerChannel,
   deepseekChannel,
+  discordChannel,
+  geminiChannel,
   googleFormTriggerChannel,
   httpRequestChannel,
   manualTriggerChannel,
-  discordChannel,
-  geminiChannel,
   openaiChannel,
-  resendChannel
+  resendChannel,
 } from "./channels";
 import { inngest } from "./client";
-import { topologicalSort } from "./utils";
+import {
+  calculateNextRun,
+  sendWorkflowExecution,
+  topologicalSort,
+} from "./utils";
 
 export const executeWorkflow = inngest.createFunction(
   {
@@ -44,6 +50,7 @@ export const executeWorkflow = inngest.createFunction(
       openaiChannel(),
       discordChannel(),
       resendChannel(),
+      cronTriggerChannel(),
     ],
   },
   async ({ event, step, publish }) => {
@@ -112,5 +119,58 @@ export const executeWorkflow = inngest.createFunction(
     });
 
     return { workflowId, result: context };
+  },
+);
+
+export const scheduleWorkflowExecution = inngest.createFunction(
+  {
+    id: "schedule-workflow-execution",
+    name: "Schedule Workflow Execution",
+    cancelOn: [
+      {
+        event: "workflows/cancel.workflow",
+        match: "data.workflowId",
+      },
+    ],
+  },
+  {
+    event: "workflows/schedule.workflow",
+  },
+  async ({ event, step }) => {
+    const { workflowId, cronExpression, tz } = event.data;
+
+    if (!workflowId) {
+      throw new NonRetriableError("No workflow ID provided");
+    }
+
+    await step.run("check-workflow-active", async () => {
+      await checkWorkflowActive(workflowId);
+    });
+
+    await step.run("execute-workflow", async () => {
+      await sendWorkflowExecution({
+        workflowId,
+        initialData: {
+          cronTrigger: {
+            scheduledTime: new Date().toISOString(),
+          },
+        },
+      });
+    });
+
+    await step.run("reschedule-next", async () => {
+      const nextRun = calculateNextRun(cronExpression, tz);
+      return inngest.send({
+        name: "workflows/schedule.workflow",
+        data: { workflowId },
+        ts: nextRun.getTime(),
+      });
+    });
+
+    return {
+      status: "scheduled",
+      workflowId,
+      nextRun: calculateNextRun(cronExpression, tz),
+    };
   },
 );

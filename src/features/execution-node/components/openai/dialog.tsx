@@ -31,7 +31,7 @@ import { OPENAI_AVAILABLE_MODELS } from "@/lib/configs/ai-constants";
 import { getCredentialLogo } from "@/lib/configs/credential-constants";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { OpenaiData, openaiDataSchema } from "./schema";
 
@@ -51,7 +51,6 @@ export function OpenaiDialog({
   const { data: credentials, isLoading: isCredentialsLoading } =
     useCredentialByType("OPENAI");
   const logo = getCredentialLogo("OPENAI");
-  const submitButtonRef = useRef<HTMLButtonElement>(null);
   const form = useForm<OpenaiData>({
     resolver: zodResolver(openaiDataSchema),
     defaultValues: {
@@ -239,17 +238,11 @@ export function OpenaiDialog({
                   </FormItem>
                 )}
               />
-              <button
-                ref={submitButtonRef}
-                type="submit"
-                style={{ display: "none" }}
-                aria-hidden="true"
-              ></button>
             </form>
           </Form>
         </ScrollArea>
         <DialogFooter className="mt-4">
-          <Button onClick={() => submitButtonRef.current?.click()}>Save</Button>
+          <Button onClick={form.handleSubmit(handleSubmit)}>Save</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

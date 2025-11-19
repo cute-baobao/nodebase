@@ -6,6 +6,7 @@ import { httpRequestExecutor } from "@/features/execution-node/components/http-r
 import { openaiExecutor } from "@/features/execution-node/components/openai/executor";
 import { resendExecutor } from "@/features/execution-node/components/resend/executor";
 import { NodeExecutor } from "@/features/executions/type";
+import { cronTriggerExecutor } from "@/features/triggers/components/cron-trigger/executor";
 import { googleFormTriggerExecutor } from "@/features/triggers/components/google-form-trigger/executor";
 import { manualTriggerExecutor } from "@/features/triggers/components/manual-trigger/executor";
 import { stripeTriggerExecutor } from "@/features/triggers/components/stripe-trigger/executor";
@@ -31,6 +32,8 @@ export const executeRegistry: Record<NodeType, NodeExecutor> = {
   [NodeTypeValues[8]]: discordExecutor,
   // RESEND
   [NodeTypeValues[9]]: resendExecutor,
+  // CRON_TRIGGER
+  [NodeTypeValues[10]]: cronTriggerExecutor,
 };
 
 export const getExecutor = (type: NodeType): NodeExecutor => {

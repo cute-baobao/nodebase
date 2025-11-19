@@ -31,7 +31,7 @@ import { getCredentialLogo } from "@/lib/configs/credential-constants";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { X } from "lucide-react";
 import Image from "next/image";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect } from "react";
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import { ResendData, resendDataSchema } from "./schema";
 
@@ -51,7 +51,6 @@ export function ResendDialog({
   const { data: credentials, isLoading: isCredentialsLoading } =
     useCredentialByType("RESEND");
   const logo = getCredentialLogo("RESEND");
-  const submitButtonRef = useRef<HTMLButtonElement>(null);
   const form = useForm<ResendData>({
     resolver: zodResolver(resendDataSchema),
     defaultValues: {
@@ -303,17 +302,11 @@ export function ResendDialog({
                   </FormItem>
                 )}
               />
-              <button
-                ref={submitButtonRef}
-                type="submit"
-                style={{ display: "none" }}
-                aria-hidden="true"
-              ></button>
             </form>
           </Form>
         </ScrollArea>
         <DialogFooter className="mt-4">
-          <Button onClick={() => submitButtonRef.current?.click()}>Save</Button>
+          <Button onClick={form.handleSubmit(handleSubmit)}>Save</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

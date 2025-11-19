@@ -30,10 +30,10 @@ import { useCredentialByType } from "@/features/credentials/hooks/use-credential
 import { DEEPSEEK_AVAILABLE_MODELS } from "@/lib/configs/ai-constants";
 import { getCredentialLogo } from "@/lib/configs/credential-constants";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useCallback, useEffect, useRef } from "react";
+import Image from "next/image";
+import { useCallback, useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { DeepseekData, deepseekDataSchema } from "./schema";
-import Image from "next/image";
 
 interface DeepseekDialogProps {
   open: boolean;
@@ -51,7 +51,6 @@ export function DeepseekDialog({
   const logo = getCredentialLogo("DEEPSEEK");
   const { data: credentials, isLoading: isCredentialsLoading } =
     useCredentialByType("DEEPSEEK");
-  const submitButtonRef = useRef<HTMLButtonElement>(null);
   const form = useForm<DeepseekData>({
     resolver: zodResolver(deepseekDataSchema),
     defaultValues: {
@@ -239,17 +238,11 @@ export function DeepseekDialog({
                   </FormItem>
                 )}
               />
-              <button
-                ref={submitButtonRef}
-                type="submit"
-                style={{ display: "none" }}
-                aria-hidden="true"
-              ></button>
             </form>
           </Form>
         </ScrollArea>
         <DialogFooter className="mt-4">
-          <Button onClick={() => submitButtonRef.current?.click()}>Save</Button>
+          <Button onClick={form.handleSubmit(handleSubmit)}>Save</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

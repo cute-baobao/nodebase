@@ -1,6 +1,6 @@
 import { NodeType, NodeTypeValues } from "@/db";
 import { useReactFlow } from "@xyflow/react";
-import { GlobeIcon, MousePointerIcon } from "lucide-react";
+import { GlobeIcon, MousePointerIcon, TimerIcon } from "lucide-react";
 import Image from "next/image";
 import React, { useCallback } from "react";
 import { toast } from "sonner";
@@ -41,6 +41,12 @@ const triggerNodeTypes: NodeTypeOption[] = [
     label: "Stripe Event",
     description: "Runs the workflow when a Stripe event is captured.",
     icon: "/logos/stripe.svg",
+  },
+  {
+    type: NodeTypeValues[10],
+    label: "Cron Trigger",
+    description: "Runs the workflow on a schedule.",
+    icon: TimerIcon,
   },
 ];
 

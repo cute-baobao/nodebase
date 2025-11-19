@@ -51,7 +51,7 @@ export const resendExecutor: NodeExecutor<ResendNodeData> = async ({
       );
     }
 
-    const credential = await step.run("get-openai-credential", () => {
+    const credential = await step.run("get-resend-credential", () => {
       return db.query.credential.findFirst({
         where: (c, { and, eq }) =>
           and(eq(c.id, safeData.data.credentialId), eq(c.userId, userId)),

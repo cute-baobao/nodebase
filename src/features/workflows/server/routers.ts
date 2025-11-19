@@ -1,6 +1,8 @@
 import { connection, node, NodeType, NodeTypeValues, workflow } from "@/db";
 import db from "@/db/instance";
-import { sendWorkflowExecution } from "@/inngest/utils";
+import { cronJobDataSchema } from "@/features/triggers/components/cron-trigger/schema";
+import { inngest } from "@/inngest/client";
+import { calculateNextRun, sendWorkflowExecution } from "@/inngest/utils";
 import { PAGINATION } from "@/lib/configs/constants";
 import { edgeSchema, nodeSchema } from "@/lib/shared/schemas/workflow";
 import {
@@ -134,6 +136,49 @@ export const workflowsRouter = createTRPCRouter({
   updateWorkflowActiveStatus: protectedProcedure
     .input(z.object({ id: z.string(), isActive: z.boolean() }))
     .mutation(async ({ ctx, input }) => {
+      const { id, isActive } = input;
+      if (isActive) {
+        const workflow = await WorkflowDb.getOne({
+          workflowId: id,
+          userId: ctx.auth.user.id,
+        });
+        const cronNode = workflow.nodes.find((n) => n.type === "CRON_TRIGGER");
+        if (!cronNode) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Cannot activate workflow without a cron trigger node",
+          });
+        }
+        const safeCronJobData = cronJobDataSchema.safeParse(cronNode.data);
+        if (!safeCronJobData.success) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message:
+              "Cron trigger node has invalid configuration: " +
+              safeCronJobData.error.issues.map((i) => i.message).join(", "),
+          });
+        }
+        await inngest.send({
+          name: "workflows/schedule.workflow",
+          data: {
+            workflowId: id,
+            cronExpression: safeCronJobData.data.cronExpression,
+            tz: safeCronJobData.data.timezone,
+          },
+          ts: calculateNextRun(
+            safeCronJobData.data.cronExpression,
+            safeCronJobData.data.timezone || "UTC",
+          ).getTime(),
+        });
+      } else {
+        // Deactivating a workflow - send cancel event
+        await inngest.send({
+          name: "workflows/cancel.workflow",
+          data: {
+            workflowId: id,
+          },
+        });
+      }
       return await db
         .update(workflow)
         .set({
