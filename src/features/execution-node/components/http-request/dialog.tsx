@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { HttpRequestData, httpRequestDataSchema } from "./schema";
 
@@ -44,7 +44,6 @@ export function HttpRequestDialog({
   onSubmit,
   defaultValues = {},
 }: HttpRequestDialogProps) {
-  const submitButtonRef = useRef<HTMLButtonElement>(null);
   const form = useForm<HttpRequestData>({
     resolver: zodResolver(httpRequestDataSchema),
     defaultValues: {
@@ -191,17 +190,11 @@ export function HttpRequestDialog({
                   )}
                 />
               )}
-              <button
-                ref={submitButtonRef}
-                type="submit"
-                style={{ display: "none" }}
-                aria-hidden="true"
-              ></button>
             </form>
           </Form>
         </ScrollArea>
         <DialogFooter className="mt-4">
-          <Button onClick={() => submitButtonRef.current?.click()}>Save</Button>
+          <Button onClick={form.handleSubmit(handleSubmit)}>Save</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

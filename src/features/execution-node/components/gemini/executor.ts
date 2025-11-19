@@ -32,7 +32,7 @@ export const geminiExecutor: NodeExecutor<GeminiNodeData> = async ({
 }) => {
   const channel = geminiChannel();
   const changeNodeStatusUtil = async (status: NodeStatus) => {
-    await step.run("update-manual-trigger-node-status", async () => {
+    await step.run("update-gemini-node-status", async () => {
       return updateNodeStatus({
         channel,
         nodeId,

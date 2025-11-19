@@ -18,32 +18,37 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";
-import { DiscordData, discordDataSchema } from "./schema";
+import { CronJobData, cronJobDataSchema } from "./schema";
 
-interface DiscordDialogProps {
+interface CronJobDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (data: DiscordData) => void;
-  defaultValues: Partial<DiscordData>;
+  onSubmit: (data: CronJobData) => void;
+  defaultValues: Partial<CronJobData>;
 }
 
-export function DiscordDialog({
+export function CronJobDialog({
   open,
   onOpenChange,
   onSubmit,
   defaultValues = {},
-}: DiscordDialogProps) {
-  const form = useForm<DiscordData>({
-    resolver: zodResolver(discordDataSchema),
+}: CronJobDialogProps) {
+  const form = useForm<CronJobData>({
+    resolver: zodResolver(cronJobDataSchema),
     defaultValues: {
       variableName: defaultValues.variableName || "",
-      webhookUrl: defaultValues.webhookUrl || "",
-      content: defaultValues.content || "",
-      username: defaultValues.username || "",
+      cronExpression: defaultValues.cronExpression || "",
+      timezone: defaultValues.timezone || "UTC",
     },
   });
 
@@ -51,10 +56,10 @@ export function DiscordDialog({
     useWatch({
       control: form.control,
       name: "variableName",
-    }) || "myDiscord";
+    }) || "myCronJob";
 
   const handleSubmit = useCallback(
-    (data: DiscordData) => {
+    (data: CronJobData) => {
       onSubmit(data);
       onOpenChange(false);
     },
@@ -66,9 +71,8 @@ export function DiscordDialog({
     if (open) {
       form.reset({
         variableName: defaultValues.variableName || "",
-        webhookUrl: defaultValues.webhookUrl || "",
-        content: defaultValues.content || "",
-        username: defaultValues.username || "",
+        cronExpression: defaultValues.cronExpression || "* * * * *",
+        timezone: defaultValues.timezone || "UTC",
       });
     }
   }, [open, defaultValues, form]);
@@ -77,12 +81,12 @@ export function DiscordDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="pr-4">
         <DialogHeader>
-          <DialogTitle>Discord Configuration</DialogTitle>
+          <DialogTitle>Cron Job Schedule</DialogTitle>
           <DialogDescription>
-            Configure the Discord webhook settings for this node.
+            Configure the schedule for this trigger node
           </DialogDescription>
         </DialogHeader>
-        <ScrollArea className="h-full max-h-[60vh]">
+        <ScrollArea className="h-full max-h-[60vh] w-full">
           <Form {...form}>
             <form
               className="mt-4 space-y-8 pr-4"
@@ -95,68 +99,66 @@ export function DiscordDialog({
                   <FormItem>
                     <FormLabel>Variable Name</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="myDiscord" />
+                      <Input {...field} placeholder="myCronJob" />
                     </FormControl>
                     <FormDescription>
-                      Use this name to reference the result in other node:{" "}
-                      {`{{${watchVariableName}.aiResponse.text}}`}
+                      Reference this trigger in other nodes:{" "}
+                      {`{{${watchVariableName}.triggerTime}}`}
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+
               <FormField
                 control={form.control}
-                name="webhookUrl"
+                name="cronExpression"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Discord Webhook URL</FormLabel>
+                    <FormLabel>Cron Expression</FormLabel>
                     <FormControl>
-                      <Input
-                        {...field}
-                        placeholder="https://discord.com/api/webhooks/..."
-                      />
+                      <Input {...field} placeholder="* * * * *" />
                     </FormControl>
                     <FormDescription>
-                      Get this from Discord: Channel Setting &rarr; Integrations
-                      &rarr; Webhooks
+                      Format: Minute Hour Day Month DayOfWeek (e.g.{" "}
+                      {"0 9 * * 1"}
+                      for every Monday at 9am)
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+
               <FormField
                 control={form.control}
-                name="content"
+                name="timezone"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Message Content</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        {...field}
-                        className="min-h-[80px] font-mono text-sm"
-                        placeholder={"Hello from Nodebase! {{variable}}"}
-                      />
-                    </FormControl>
+                    <FormLabel>Timezone</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select timezone" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="UTC">UTC</SelectItem>
+                        <SelectItem value="Asia/Shanghai">
+                          Asia/Shanghai
+                        </SelectItem>
+                        <SelectItem value="America/New_York">
+                          America/New_York
+                        </SelectItem>
+                        <SelectItem value="Europe/London">
+                          Europe/London
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
                     <FormDescription>
-                      The message to send. Use {"{{variables}}"} for simple
-                      values or {"{{json variable}}"} to stringify objects.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="username"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Bot Username (Optional)</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="Bot Username" />
-                    </FormControl>
-                    <FormDescription>
-                      Overwrite the default bot username.
+                      The timezone to use for the schedule
                     </FormDescription>
                     <FormMessage />
                   </FormItem>

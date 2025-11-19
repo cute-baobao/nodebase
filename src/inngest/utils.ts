@@ -2,7 +2,9 @@ import { Connection, execution, Node } from "@/db";
 import db from "@/db/instance";
 import { NodeStatus } from "@/lib/configs/workflow-constants";
 import { Realtime, topic } from "@inngest/realtime";
+import { CronExpressionParser } from "cron-parser";
 import { eq } from "drizzle-orm";
+import { NonRetriableError } from "inngest";
 import toposort from "toposort";
 import { v4 as createID } from "uuid";
 import { inngest } from "./client";
@@ -116,4 +118,27 @@ export const updateNodeStatus = async ({
     .update(execution)
     .set({ nodeStatus: updatedStatus })
     .where(eq(execution.id, executionId));
+};
+
+export const calculateNextRun = (cronExpression: string, tz: string): Date => {
+  try {
+    const interval = CronExpressionParser.parse(cronExpression, {
+      currentDate: new Date(),
+      tz,
+    });
+    return interval.next().toDate();
+  } catch (error) {
+    throw new NonRetriableError("Invalid cron expression");
+  }
+};
+
+export const validateCronExpression = (cronExpression: string) => {
+  try {
+    CronExpressionParser.parse(cronExpression, {
+      currentDate: new Date(),
+    });
+    return true;
+  } catch {
+    return false;
+  }
 };

@@ -1,6 +1,6 @@
 import { NodeType, NodeTypeValues } from "@/db";
 import { useReactFlow } from "@xyflow/react";
-import { GlobeIcon, MousePointerIcon } from "lucide-react";
+import { GlobeIcon, MousePointerIcon, TimerIcon } from "lucide-react";
 import Image from "next/image";
 import React, { useCallback } from "react";
 import { toast } from "sonner";
@@ -42,6 +42,12 @@ const triggerNodeTypes: NodeTypeOption[] = [
     description: "Runs the workflow when a Stripe event is captured.",
     icon: "/logos/stripe.svg",
   },
+  {
+    type: NodeTypeValues[10],
+    label: "Cron Trigger",
+    description: "Runs the workflow on a schedule.",
+    icon: TimerIcon,
+  },
 ];
 
 const executionNodes: NodeTypeOption[] = [
@@ -50,12 +56,6 @@ const executionNodes: NodeTypeOption[] = [
     label: "HTTP Request",
     description: "Makes an HTTP request",
     icon: GlobeIcon,
-  },
-  {
-    type: NodeTypeValues[5],
-    label: "OpenAI",
-    description: "Use OpenAI to generate text",
-    icon: "/logos/openai.svg",
   },
   {
     type: NodeTypeValues[6],
@@ -74,6 +74,12 @@ const executionNodes: NodeTypeOption[] = [
     label: "Discord",
     description: "Use Discord to send messages",
     icon: "/logos/discord.svg",
+  },
+  {
+    type: NodeTypeValues[9],
+    label: "Resend",
+    description: "Use Resend to send email",
+    icon: "/logos/resend.svg",
   },
 ];
 

@@ -27,49 +27,64 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useCredentialByType } from "@/features/credentials/hooks/use-credentials";
-import { GEMINI_AVAILABLE_MODELS } from "@/lib/configs/ai-constants";
 import { getCredentialLogo } from "@/lib/configs/credential-constants";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { X } from "lucide-react";
 import Image from "next/image";
 import { useCallback, useEffect } from "react";
-import { useForm, useWatch } from "react-hook-form";
-import { GeminiData, geminiDataSchema } from "./schema";
+import { useFieldArray, useForm, useWatch } from "react-hook-form";
+import { ResendData, resendDataSchema } from "./schema";
 
-interface GeminiDialogProps {
+interface OpenaiDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (data: GeminiData) => void;
-  defaultValues: Partial<GeminiData>;
+  onSubmit: (data: ResendData) => void;
+  defaultValues: Partial<ResendData>;
 }
 
-export function GeminiDialog({
+export function ResendDialog({
   open,
   onOpenChange,
   onSubmit,
   defaultValues = {},
-}: GeminiDialogProps) {
+}: OpenaiDialogProps) {
   const { data: credentials, isLoading: isCredentialsLoading } =
-    useCredentialByType("GEMINI");
-  const logo = getCredentialLogo("GEMINI");
-  const form = useForm<GeminiData>({
-    resolver: zodResolver(geminiDataSchema),
+    useCredentialByType("RESEND");
+  const logo = getCredentialLogo("RESEND");
+  const form = useForm<ResendData>({
+    resolver: zodResolver(resendDataSchema),
     defaultValues: {
       credentialId: defaultValues.credentialId || "",
       variableName: defaultValues.variableName || "",
-      model: defaultValues.model || GEMINI_AVAILABLE_MODELS[0],
-      systemPrompt: defaultValues.systemPrompt || "",
-      userPrompt: defaultValues.userPrompt || "",
+      from: defaultValues.from || "",
+      to: defaultValues.to || [{ email: "" }],
+      subject: defaultValues.subject || "",
+      content: defaultValues.content || "",
     },
   });
+
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "to",
+  });
+
+  const addEmailField = useCallback(() => {
+    append({ email: "" });
+  }, [append]);
+
+  const removeEmailField = useCallback(
+    (index: number) => fields.length > 1 && remove(index),
+    [fields.length, remove],
+  );
 
   const watchVariableName =
     useWatch({
       control: form.control,
       name: "variableName",
-    }) || "myGemini";
+    }) || "myResend";
 
   const handleSubmit = useCallback(
-    (data: GeminiData) => {
+    (data: ResendData) => {
       onSubmit(data);
       onOpenChange(false);
     },
@@ -82,9 +97,10 @@ export function GeminiDialog({
       form.reset({
         credentialId: defaultValues.credentialId || "",
         variableName: defaultValues.variableName || "",
-        model: defaultValues.model || GEMINI_AVAILABLE_MODELS[0],
-        systemPrompt: defaultValues.systemPrompt || "",
-        userPrompt: defaultValues.userPrompt || "",
+        from: defaultValues.from || "",
+        to: defaultValues.to || [{ email: "" }],
+        subject: defaultValues.subject || "",
+        content: defaultValues.content || "",
       });
     }
   }, [open, defaultValues, form]);
@@ -93,9 +109,9 @@ export function GeminiDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="pr-4">
         <DialogHeader>
-          <DialogTitle>Gemini Configuration</DialogTitle>
+          <DialogTitle>Resend Configuration</DialogTitle>
           <DialogDescription>
-            Configure the AI model and prompts for this node.
+            Configure the Resend node to send emails using the Resend API.
           </DialogDescription>
         </DialogHeader>
         <ScrollArea className="h-full max-h-[60vh]">
@@ -111,11 +127,11 @@ export function GeminiDialog({
                   <FormItem>
                     <FormLabel>Variable Name</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="myGemini" />
+                      <Input {...field} placeholder="myResend" />
                     </FormControl>
                     <FormDescription>
                       Use this name to reference the result in other node:{" "}
-                      {`{{${watchVariableName}.aiResponse.text}}`}
+                      {`{{${watchVariableName}.id}}`}
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -126,7 +142,7 @@ export function GeminiDialog({
                 name="credentialId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Gemini Credential</FormLabel>
+                    <FormLabel>Resend Credential</FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
@@ -164,51 +180,15 @@ export function GeminiDialog({
               />
               <FormField
                 control={form.control}
-                name="model"
+                name="from"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Model</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select a model" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {GEMINI_AVAILABLE_MODELS.map((model) => (
-                          <SelectItem key={model} value={model}>
-                            {model}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormDescription>
-                      The AI model to use for the request.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="systemPrompt"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>System Prompt (Optional)</FormLabel>
+                    <FormLabel>From</FormLabel>
                     <FormControl>
-                      <Textarea
-                        {...field}
-                        className="min-h-[80px] font-mono text-sm"
-                        placeholder={"You are a helpful assistant that..."}
-                      />
+                      <Input {...field} placeholder="bao <bao@mail.com>" />
                     </FormControl>
                     <FormDescription>
-                      Sets the behavior of the assistant. Use {"{{variables}}"}{" "}
-                      for simple values or {"{{json variable}}"} to stringify
-                      objects.
+                      The email address to send from.
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -216,22 +196,103 @@ export function GeminiDialog({
               />
               <FormField
                 control={form.control}
-                name="userPrompt"
+                name="to"
+                render={({}) => (
+                  <FormItem>
+                    <div className="flex items-center justify-between">
+                      <FormLabel className="text-base">
+                        Recipient Emails
+                      </FormLabel>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={addEmailField}
+                      >
+                        Add Email
+                      </Button>
+                    </div>
+                    <FormControl>
+                      <div className="space-y-2">
+                        {fields.map((field, index) => (
+                          <FormField
+                            key={field.id}
+                            control={form.control}
+                            name={`to.${index}`}
+                            render={({ field: emailField }) => (
+                              <FormItem>
+                                <FormControl>
+                                  <div className="flex gap-2">
+                                    <Input
+                                      type="email"
+                                      placeholder={`recipient${index + 1}@example.com`}
+                                      value={emailField.value.email}
+                                      onChange={(e) =>
+                                        emailField.onChange({
+                                          email: e.target.value,
+                                        })
+                                      }
+                                    />
+                                    <Button
+                                      type="button"
+                                      variant="ghost"
+                                      size="icon"
+                                      onClick={() => removeEmailField(index)}
+                                      disabled={fields.length === 1}
+                                      className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                                    >
+                                      <X className="h-4 w-4" />
+                                    </Button>
+                                  </div>
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        ))}
+                      </div>
+                    </FormControl>
+                    <FormDescription>
+                      Add one or more recipient email addresses. Click{" "}
+                      {'"Add Email"'} to add additional recipients
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="subject"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>User Prompt</FormLabel>
+                    <FormLabel>Subject</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="myResend" />
+                    </FormControl>
+                    <FormDescription>
+                      The subject of the email. Use {"{{variables}}"} for simple
+                      values or {"{{json variable}}"} to stringify objects
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="content"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Content</FormLabel>
                     <FormControl>
                       <Textarea
                         {...field}
                         className="min-h-[120px] font-mono text-sm"
-                        placeholder={
-                          "Summarize the text: {{json httpResponse.data}}"
-                        }
+                        placeholder={"Email: {{json httpResponse.data}}"}
                       />
                     </FormControl>
                     <FormDescription>
-                      The prompt to send to the AI. Use {"{{variables}}"} for
-                      simple values or {"{{json variable}}"} to stringify
+                      The content to send to the email. Use {"{{variables}}"}{" "}
+                      for simple values or {"{{json variable}}"} to stringify
                       objects.
                     </FormDescription>
                     <FormMessage />

@@ -128,6 +128,28 @@ export const useUpdatedWorkflow = () => {
   );
 };
 
+export const useUpdatedWorkflowActive = () => {
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
+
+  return useMutation(
+    trpc.workflows.updateWorkflowActiveStatus.mutationOptions({
+      onSuccess: (data) => {
+        toast.success(
+          `Workflow ${data[0].id} ${data[0].active ? "activated" : "deactivated"}`,
+        );
+        queryClient.invalidateQueries(trpc.workflows.getMany.queryOptions({}));
+        queryClient.invalidateQueries(
+          trpc.workflows.getOne.queryFilter({ id: data[0].id }),
+        );
+      },
+      onError: (error) => {
+        toast.error(`Failed to update workflow: ${error.message}`);
+      },
+    }),
+  );
+};
+
 /*
  * @description Hook to execute a workflow.
  * @returns A TRPC mutation for executing a workflow.

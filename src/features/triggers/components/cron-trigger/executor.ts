@@ -1,16 +1,22 @@
 import { NodeExecutor } from "@/features/executions/type";
-import { googleFormTriggerChannel } from "@/inngest/channels";
+import { cronTriggerChannel } from "@/inngest/channels";
 import { updateNodeStatus } from "@/inngest/utils";
 import { NodeStatus } from "@/lib/configs/workflow-constants";
+import { CronJobData } from "./schema";
 
-type GoogleFormTriggerData = Record<string, unknown>;
+type CronTriggerData = Partial<CronJobData>;
 
-export const googleFormTriggerExecutor: NodeExecutor<
-  GoogleFormTriggerData
-> = async ({ data, nodeId, context, step, publish, executionId }) => {
-  const channel = googleFormTriggerChannel();
+export const cronTriggerExecutor: NodeExecutor<CronTriggerData> = async ({
+  executionId,
+  nodeId,
+  context,
+  step,
+  publish,
+}) => {
+  const channel = cronTriggerChannel();
+
   const changeNodeStatusUtil = async (status: NodeStatus) => {
-    await step.run("update-google-form-trigger-node-status", async () => {
+    await step.run("update-cron-trigger-node-status", async () => {
       return updateNodeStatus({
         channel,
         nodeId,
@@ -24,10 +30,9 @@ export const googleFormTriggerExecutor: NodeExecutor<
   try {
     await changeNodeStatusUtil("loading");
 
-    const result = await step.run("google-form-trigger", async () => context);
+    const result = await step.run("cron-trigger", async () => context);
 
     await changeNodeStatusUtil("success");
-
     return result;
   } catch (error) {
     await changeNodeStatusUtil("error");
