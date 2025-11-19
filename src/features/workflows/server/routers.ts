@@ -131,6 +131,19 @@ export const workflowsRouter = createTRPCRouter({
         )
         .returning();
     }),
+  updateWorkflowActiveStatus: protectedProcedure
+    .input(z.object({ id: z.string(), isActive: z.boolean() }))
+    .mutation(async ({ ctx, input }) => {
+      return await db
+        .update(workflow)
+        .set({
+          active: input.isActive,
+        })
+        .where(
+          and(eq(workflow.id, input.id), eq(workflow.userId, ctx.auth.user.id)),
+        )
+        .returning();
+    }),
   getOne: protectedProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ ctx, input }) => {
@@ -160,6 +173,7 @@ export const workflowsRouter = createTRPCRouter({
         name: data.name,
         nodes,
         edges,
+        active: data.active,
       };
     }),
   getMany: protectedProcedure

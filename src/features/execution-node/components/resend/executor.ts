@@ -29,7 +29,7 @@ export const resendExecutor: NodeExecutor<ResendNodeData> = async ({
 }) => {
   const channel = resendChannel();
   const changeNodeStatusUtil = async (status: NodeStatus) => {
-    await step.run("update-manual-trigger-node-status", async () => {
+    await step.run("update-resend-node-status", async () => {
       return updateNodeStatus({
         channel,
         nodeId,

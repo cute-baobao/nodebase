@@ -32,7 +32,7 @@ export const deepseekExecutor: NodeExecutor<DeepseekNodeData> = async ({
 }) => {
   const channel = deepseekChannel();
   const changeNodeStatusUtil = async (status: NodeStatus) => {
-    await step.run("update-manual-trigger-node-status", async () => {
+    await step.run("update-deepseek-node-status", async () => {
       return updateNodeStatus({
         channel,
         nodeId,

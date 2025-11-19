@@ -1,3 +1,4 @@
+import { checkWorkflowActive } from "@/features/triggers/utils/check-workflow-active";
 import { sendWorkflowExecution } from "@/inngest/utils";
 import { NextResponse, type NextRequest } from "next/server";
 
@@ -15,6 +16,8 @@ export async function POST(request: NextRequest) {
         { status: 400 },
       );
     }
+
+    await checkWorkflowActive(workflowId);
 
     const body = await request.json();
 
@@ -46,7 +49,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         success: false,
-        error: "Failed to process submission",
+        error:
+          "Failed to process submission: " +
+          (error instanceof Error ? error.message : String(error)),
       },
       { status: 500 },
     );

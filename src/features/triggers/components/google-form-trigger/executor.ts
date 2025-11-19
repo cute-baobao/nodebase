@@ -10,7 +10,7 @@ export const googleFormTriggerExecutor: NodeExecutor<
 > = async ({ data, nodeId, context, step, publish, executionId }) => {
   const channel = googleFormTriggerChannel();
   const changeNodeStatusUtil = async (status: NodeStatus) => {
-    await step.run("update-manual-trigger-node-status", async () => {
+    await step.run("update-google-form-trigger-node-status", async () => {
       return updateNodeStatus({
         channel,
         nodeId,

@@ -1,5 +1,13 @@
 import { InferSelectModel } from "drizzle-orm";
-import { json, pgEnum, pgTable, text, unique, uuid } from "drizzle-orm/pg-core";
+import {
+  boolean,
+  json,
+  pgEnum,
+  pgTable,
+  text,
+  unique,
+  uuid,
+} from "drizzle-orm/pg-core";
 import { user } from "./auth-schema";
 import { credential } from "./credential-schema";
 import { timestamps } from "./fields";
@@ -11,6 +19,7 @@ export const workflow = pgTable("workflow", {
   userId: text("user_id")
     .references(() => user.id, { onDelete: "cascade" })
     .notNull(),
+  active: boolean().default(false),
   ...timestamps,
 });
 export type Workflow = InferSelectModel<typeof workflow>;
@@ -28,6 +37,7 @@ export const nodeType = pgEnum("node_type", [
   "DEEPSEEK",
   "DISCORD",
   "RESEND",
+  "CRON_TRIGGER"
 ]);
 
 export const NodeTypeValues = nodeType.enumValues;

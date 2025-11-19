@@ -8,16 +8,28 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { Switch } from "@/components/ui/switch";
+import { NodeType } from "@/db";
 import {
   useSuspenseSingleWorkflow,
   useUpdatedWorkflow,
+  useUpdatedWorkflowActive,
   useUpdatedWorkflowName,
 } from "@/features/workflows/hooks/use-workflows";
+import { CRON_AND_WEBHOOK_NODES } from "@/lib/configs/workflow-constants";
 import { useAtomValue } from "jotai";
 import { SaveIcon } from "lucide-react";
 import Link from "next/link";
-import { createContext, use, useEffect, useRef, useState } from "react";
+import {
+  createContext,
+  use,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { editorAtom } from "../store/atoms";
 
 function EditorNameInput() {
@@ -129,11 +141,44 @@ export function EditorSaveButton() {
   };
 
   return (
-    <div className="ml-auto">
-      <Button size="sm" onClick={handleSave} disabled={saveWorkflow.isPending}>
-        <SaveIcon className="size-4" />
-        Save
-      </Button>
+    <Button size="sm" onClick={handleSave} disabled={saveWorkflow.isPending}>
+      <SaveIcon className="size-4" />
+      Save
+    </Button>
+  );
+}
+
+export function EditorActiveToggle() {
+  const { workflowId } = use(EditorHeaderContext);
+  const { data: workflow } = useSuspenseSingleWorkflow(workflowId);
+  const editor = useAtomValue(editorAtom);
+  const updateWorkflow = useUpdatedWorkflowActive();
+
+  // Check if there are any WebhookTrigger or CRON_TRIGGER nodes
+  const haveWebhookOrCronNodes = useMemo(() => {
+    if (!editor) return false;
+    const nodes = editor.getNodes();
+    return nodes.some(
+      (node) =>
+        node.type && CRON_AND_WEBHOOK_NODES.includes(node.type as NodeType),
+    );
+  }, [editor]);
+
+  if (!haveWebhookOrCronNodes) return null;
+
+  return (
+    <div className="flex items-center space-x-2">
+      <Switch
+        checked={workflow.active!}
+        onCheckedChange={(checked) => {
+          updateWorkflow.mutate({ id: workflowId, isActive: checked });
+        }}
+        disabled={updateWorkflow.isPending}
+        id="airplane-mode"
+      />
+      <Label htmlFor="airplane-mode">
+        {workflow.active ? "Inactive" : "Active"}
+      </Label>
     </div>
   );
 }
@@ -149,7 +194,10 @@ export function EditorHeader({ workflowId }: { workflowId: string }) {
         <SidebarTrigger />
         <div className="flex w-full flex-row items-center justify-between gap-x-4">
           <EditorBreadcrumbs />
-          <EditorSaveButton />
+          <div className="ml-auto flex items-center gap-4">
+            <EditorActiveToggle />
+            <EditorSaveButton />
+          </div>
         </div>
       </header>
     </EditorHeaderContext.Provider>

@@ -32,7 +32,7 @@ export const openaiExecutor: NodeExecutor<OpenaiNodeData> = async ({
 }) => {
   const channel = openaiChannel();
   const changeNodeStatusUtil = async (status: NodeStatus) => {
-    await step.run("update-manual-trigger-node-status", async () => {
+    await step.run("update-openai-node-status", async () => {
       return updateNodeStatus({
         channel,
         nodeId,

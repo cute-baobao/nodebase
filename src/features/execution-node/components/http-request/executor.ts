@@ -31,7 +31,7 @@ export const httpRequestExecutor: NodeExecutor<HttpRequestData> = async ({
 }) => {
   const channel = httpRequestChannel();
   const changeNodeStatusUtil = async (status: NodeStatus) => {
-    await step.run("update-manual-trigger-node-status", async () => {
+    await step.run("update-http-request-node-status", async () => {
       return updateNodeStatus({
         channel,
         nodeId,

@@ -1,6 +1,6 @@
 import { EdgeWithToolbar } from "@/components/edge-with-toolbar";
 import { InitialNode } from "@/components/initial-node";
-import { NodeTypeValues } from "@/db";
+import { NodeType, NodeTypeValues } from "@/db";
 import { DeepseekNode } from "@/features/execution-node/components/deepseek/node";
 import { DiscordNode } from "@/features/execution-node/components/discord/node";
 import { GeminiNode } from "@/features/execution-node/components/gemini/node";
@@ -11,6 +11,12 @@ import { GoogleFormTrigger } from "@/features/triggers/components/google-form-tr
 import { ManualTriggerNode } from "@/features/triggers/components/manual-trigger/node";
 import { StripeTrigger } from "@/features/triggers/components/stripe-trigger/node";
 import { EdgeTypes, NodeTypes } from "@xyflow/react";
+
+export const CRON_AND_WEBHOOK_NODES: NodeType[] = [
+  NodeTypeValues[4], // STRIPE_TRIGGER
+  NodeTypeValues[3], // GOOGLE_FORM_TRIGGER
+  NodeTypeValues[10], // CRON_TRIGGER
+];
 
 export const nodeComponents = {
   [NodeTypeValues[0]]: InitialNode,
