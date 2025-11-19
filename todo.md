@@ -10,7 +10,8 @@
 - [x] execution node的执行条件需要增加判断，如无source无法执行，无target可执行 25/11/15
   - complete at 25/11/15
 
-- [x] resend-node 25/11/15 不好用，需要提供域名才可正常使用，否则只能发送到自己的邮箱
-  - complete at 25/11/18
+- [x] resend-node 普通的emailnode 数据库node 通用的ainode + 给ai提供memory，连接向量数据库。at 25/11/15
 
-- [ ] 普通的emailnode 数据库node 通用的ainode + 给ai提供memory，连接向量数据库。
+- [ ] 给editor添加一个active的标签，供webhook trigger 和 cron trigger被调用，判断是否启用的标识。at 25/11/18
+
+- [ ] 开发一个cron trigger实现定时调用的功能 at 25/11/18
