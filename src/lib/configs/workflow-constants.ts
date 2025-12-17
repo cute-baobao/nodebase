@@ -1,12 +1,15 @@
 import { EdgeWithToolbar } from "@/components/edge-with-toolbar";
 import { InitialNode } from "@/components/initial-node";
 import { NodeType, NodeTypeValues } from "@/db";
+import { DelayNode } from "@/features/execution-node/components/delay/node";
 import { DeepseekNode } from "@/features/execution-node/components/deepseek/node";
 import { DiscordNode } from "@/features/execution-node/components/discord/node";
 import { GeminiNode } from "@/features/execution-node/components/gemini/node";
 import { HttpRequestNode } from "@/features/execution-node/components/http-request/node";
 import { OpenaiNode } from "@/features/execution-node/components/openai/node";
 import { ResendNode } from "@/features/execution-node/components/resend/node";
+import { XCreatePostNode } from "@/features/execution-node/components/x-create-post/node";
+import { XGetTweetNode } from "@/features/execution-node/components/x-get-tweet/node";
 import { CronTriggerNode } from "@/features/triggers/components/cron-trigger/node";
 import { GoogleFormTrigger } from "@/features/triggers/components/google-form-trigger/node";
 import { ManualTriggerNode } from "@/features/triggers/components/manual-trigger/node";
@@ -31,6 +34,9 @@ export const nodeComponents = {
   [NodeTypeValues[8]]: DiscordNode,
   [NodeTypeValues[9]]: ResendNode,
   [NodeTypeValues[10]]: CronTriggerNode,
+  [NodeTypeValues[11]]: XCreatePostNode,
+  [NodeTypeValues[12]]: XGetTweetNode,
+  [NodeTypeValues[13]]: DelayNode,
 } as const satisfies NodeTypes;
 
 export type RegisteredNodeType = keyof typeof nodeComponents;

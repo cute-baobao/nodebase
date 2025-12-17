@@ -8,6 +8,7 @@ import { NonRetriableError } from "inngest";
 import {
   cronTriggerChannel,
   deepseekChannel,
+  delayChannel,
   discordChannel,
   geminiChannel,
   googleFormTriggerChannel,
@@ -15,6 +16,8 @@ import {
   manualTriggerChannel,
   openaiChannel,
   resendChannel,
+  xCreatePostChannel,
+  xGetTweetChannel,
 } from "./channels";
 import { inngest } from "./client";
 import {
@@ -51,6 +54,9 @@ export const executeWorkflow = inngest.createFunction(
       discordChannel(),
       resendChannel(),
       cronTriggerChannel(),
+      xCreatePostChannel(),
+      xGetTweetChannel(),
+      delayChannel(),
     ],
   },
   async ({ event, step, publish }) => {
@@ -137,7 +143,10 @@ export const scheduleWorkflowExecution = inngest.createFunction(
     event: "workflows/schedule.workflow",
   },
   async ({ event, step }) => {
-    const { workflowId, cronExpression, tz } = event.data;
+    const { workflowId, cronExpression, tz, count } = event.data;
+
+    const currentCount =
+      (typeof count === "number" && !Number.isNaN(count) ? count : 0) + 1;
 
     if (!workflowId) {
       throw new NonRetriableError("No workflow ID provided");
@@ -153,6 +162,7 @@ export const scheduleWorkflowExecution = inngest.createFunction(
         initialData: {
           cronTrigger: {
             scheduledTime: new Date().toISOString(),
+            count: currentCount,
           },
         },
       });
@@ -162,7 +172,7 @@ export const scheduleWorkflowExecution = inngest.createFunction(
       const nextRun = calculateNextRun(cronExpression, tz);
       return inngest.send({
         name: "workflows/schedule.workflow",
-        data: { workflowId, cronExpression, tz },
+        data: { workflowId, cronExpression, tz, count: currentCount },
         ts: nextRun.getTime(),
       });
     });
@@ -171,6 +181,7 @@ export const scheduleWorkflowExecution = inngest.createFunction(
       status: "scheduled",
       workflowId,
       nextRun: calculateNextRun(cronExpression, tz),
+      count: currentCount,
     };
   },
 );

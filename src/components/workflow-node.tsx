@@ -1,6 +1,7 @@
 import { NodeToolbar, Position } from "@xyflow/react";
 import { SettingsIcon, TrashIcon } from "lucide-react";
 import { Button } from "./ui/button";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 interface WorkflowNodeProps {
   children?: React.ReactNode;
@@ -40,9 +41,16 @@ export function WorkflowNode({
         >
           <p className="font-medium">{name}</p>
           {description && (
-            <p className="text-muted-foreground truncate text-sm">
-              {description}
-            </p>
+            <Tooltip>
+              <TooltipTrigger>
+                <p className="text-muted-foreground max-w-2xs text-sm wrap-break-word">
+                  {description}
+                </p>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="max-w-xs text-sm">{description}</p>
+              </TooltipContent>
+            </Tooltip>
           )}
         </NodeToolbar>
       )}

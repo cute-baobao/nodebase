@@ -37,7 +37,10 @@ export const nodeType = pgEnum("node_type", [
   "DEEPSEEK",
   "DISCORD",
   "RESEND",
-  "CRON_TRIGGER"
+  "CRON_TRIGGER",
+  "X_CREATE_POST",
+  "X_GET_TWEET",
+  "DELAY",
 ]);
 
 export const NodeTypeValues = nodeType.enumValues;

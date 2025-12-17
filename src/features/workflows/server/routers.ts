@@ -116,7 +116,7 @@ export const workflowsRouter = createTRPCRouter({
           .update(workflow)
           .set({ updatedAt: new Date() })
           .where(eq(workflow.id, data.id));
-
+        
         return data;
       });
     }),

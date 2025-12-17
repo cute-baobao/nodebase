@@ -133,6 +133,8 @@ export function EditorSaveButton() {
     const nodes = editor.getNodes();
     const edges = editor.getEdges();
 
+    console.log("Saving workflow", { nodes, edges });
+
     saveWorkflow.mutate({
       id: workflowId,
       nodes,

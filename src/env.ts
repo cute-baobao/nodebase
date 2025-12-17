@@ -11,7 +11,9 @@ export const env = createEnv({
     POLAR_ACCESS_TOKEN: z.string().min(1, "POLAR_ACCESS_TOKEN is required"),
     POLAR_SUCCESS_URL: z.url().min(1, "POLAR_SUCCESS_URL is required"),
     ENCRYPTION_KEY: z.string().min(1, "ENCRYPTION_KEY is required"),
-    NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
+    NODE_ENV: z
+      .enum(["development", "production", "test"])
+      .default("development"),
   },
   client: {
     NEXT_PUBLIC_API_BASE_URL: z
@@ -35,4 +37,5 @@ export const env = createEnv({
   // experimental__runtimeEnv: {
   //   NEXT_PUBLIC_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_PUBLISHABLE_KEY,
   // }
+  emptyStringAsUndefined: true,
 });
