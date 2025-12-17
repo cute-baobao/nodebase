@@ -35,7 +35,7 @@ import { useCallback, useEffect } from "react";
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import { ResendData, resendDataSchema } from "./schema";
 
-interface OpenaiDialogProps {
+interface ResendDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSubmit: (data: ResendData) => void;
@@ -47,7 +47,7 @@ export function ResendDialog({
   onOpenChange,
   onSubmit,
   defaultValues = {},
-}: OpenaiDialogProps) {
+}: ResendDialogProps) {
   const { data: credentials, isLoading: isCredentialsLoading } =
     useCredentialByType("RESEND");
   const logo = getCredentialLogo("RESEND");

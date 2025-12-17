@@ -1,10 +1,13 @@
 import { NodeType, NodeTypeValues } from "@/db";
+import { delayExecutor } from "@/features/execution-node/components/delay/executor";
 import { deepseekExecutor } from "@/features/execution-node/components/deepseek/executor";
 import { discordExecutor } from "@/features/execution-node/components/discord/executor";
 import { geminiExecutor } from "@/features/execution-node/components/gemini/executor";
 import { httpRequestExecutor } from "@/features/execution-node/components/http-request/executor";
 import { openaiExecutor } from "@/features/execution-node/components/openai/executor";
 import { resendExecutor } from "@/features/execution-node/components/resend/executor";
+import { xCreatePostExecutor } from "@/features/execution-node/components/x-create-post/executor";
+import { xGetTweetExecutor } from "@/features/execution-node/components/x-get-tweet/executor";
 import { NodeExecutor } from "@/features/executions/type";
 import { cronTriggerExecutor } from "@/features/triggers/components/cron-trigger/executor";
 import { googleFormTriggerExecutor } from "@/features/triggers/components/google-form-trigger/executor";
@@ -34,6 +37,12 @@ export const executeRegistry: Record<NodeType, NodeExecutor> = {
   [NodeTypeValues[9]]: resendExecutor,
   // CRON_TRIGGER
   [NodeTypeValues[10]]: cronTriggerExecutor,
+  // X_CREATE_POST
+  [NodeTypeValues[11]]: xCreatePostExecutor,
+  // X_GET_TWEET
+  [NodeTypeValues[12]]: xGetTweetExecutor,
+  // DELAY
+  [NodeTypeValues[13]]: delayExecutor,
 };
 
 export const getExecutor = (type: NodeType): NodeExecutor => {

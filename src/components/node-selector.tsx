@@ -81,6 +81,24 @@ const executionNodes: NodeTypeOption[] = [
     description: "Use Resend to send email",
     icon: "/logos/resend.svg",
   },
+  {
+    type: NodeTypeValues[11],
+    label: "X Create Post",
+    description: "Use X Create Post to create posts",
+    icon: "/logos/x.svg",
+  },
+  {
+    type: NodeTypeValues[12],
+    label: "X Get Tweet",
+    description: "Use X Get Tweet to fetch tweets",
+    icon: "/logos/x.svg",
+  },
+  {
+    type: NodeTypeValues[13],
+    label: "Delay",
+    description: "Pause the workflow for a specified duration",
+    icon: TimerIcon,
+  },
 ];
 
 interface NodeSelectorProps {
