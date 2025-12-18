@@ -17,3 +17,5 @@
 
 - [x] 开发一个cron trigger实现定时调用的功能 at 25/11/18
   - complete at 25/11/19
+
+- [ ] 为x-get-tweet node 适配cron trigger at 25/12/18

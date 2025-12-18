@@ -16,6 +16,11 @@ Handlebars.registerHelper("json", (context) => {
   return safeString;
 });
 
+type CronTrigger = {
+  count: number;
+  scheduledTime: string;
+};
+
 export const xGetTweetExecutor: NodeExecutor<XGetTweetNodeData> = async ({
   data,
   nodeId,
@@ -50,6 +55,15 @@ export const xGetTweetExecutor: NodeExecutor<XGetTweetNodeData> = async ({
     }
 
     const result = await step.run("x-get-tweet", async () => {
+      const contextCronTrigger = context.cronTrigger as CronTrigger | undefined;
+
+      // 只有当配置了since过滤且有cron触发器时，才需要startTime
+      const shouldUseSinceFilter = safeData.data.since && contextCronTrigger;
+      const isFirstRun = contextCronTrigger?.count === 1;
+      const startTime = shouldUseSinceFilter && !isFirstRun
+        ? contextCronTrigger.scheduledTime
+        : undefined;
+
       const userClient = new TwitterApi({
         appKey: process.env.X_APP_KEY!,
         appSecret: process.env.X_APP_SECRET!,
@@ -66,6 +80,7 @@ export const xGetTweetExecutor: NodeExecutor<XGetTweetNodeData> = async ({
       const res = await userClient.v2.userTimeline(compiledUserId, {
         max_results: maxResults,
         "tweet.fields": ["created_at"],
+        start_time: startTime,
         exclude: ["retweets", "replies"], // 排除转发和回复
       });
 
